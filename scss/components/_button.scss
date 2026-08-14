@@ -1,0 +1,167 @@
+@use "../abstracts/colors" as *;
+@use "sass:color";
+
+.totop__btn {
+    outline: none;
+    display: grid;
+    visibility: hidden;
+    opacity: 0;
+    background-color: rgba($clr_light, .8);
+    border: 2px solid $clr_light;
+    color: $white;
+    place-items: center;
+    width: 60px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    position: fixed;
+    bottom: 4rem;
+    right: 2rem;
+    transition: all 350ms linear;
+
+    svg {
+        fill: $clr_acc;
+        width: 60%;
+    }
+
+    &.active {
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+
+
+.btn {
+    cursor: pointer;
+    outline: none;
+    background-color: transparent;
+    font-size: clamp(1.1rem, 0.9125rem + 0.6vw, 1.25rem);
+    border: none;
+
+    &__group {
+        padding: .5rem 0;
+    }
+
+    &__link {
+        border-bottom: 2px solid $clr_dark;
+        color: $clr_dark;
+        color: $clr_dark;
+
+        &:hover,
+        &:focus {
+            color: $gold;
+            border-bottom: 3px solid $gold;
+        }
+    }
+
+    .svg-icon {
+        width: 40px;
+        margin: 0;
+        cursor: pointer;
+    }
+
+
+    &__icon {
+        outline: none;
+        border: none;
+        background-color: transparent;
+
+        &.edit,
+        &.delete,
+        &.create {
+            width: 40px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        &.edit {
+            fill: silver;
+
+            &:hover,
+            &:focus {
+                fill: $clr_light;
+            }
+        }
+
+        &.delete {
+            fill: rgba(255, 0, 0, 0.6);
+
+            &:hover,
+            &:focus {
+                fill: red;
+            }
+
+        }
+
+    }
+
+    &__close {
+        font-size: 2rem;
+        background-color: red;
+        color: white;
+        aspect-ratio: 1;
+        width: 40px;
+        display: grid;
+        place-content: center;
+        text-decoration: none;
+    }
+
+    &__create {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        gap: .5rem;
+
+        svg {
+            fill: $clr_light;
+
+        }
+
+        span {
+            color: $white;
+        }
+
+        &:hover,
+        &:focus {
+            svg {
+                fill: $gold;
+            }
+
+            span {
+                color: $clr_acc;
+            }
+
+        }
+    }
+
+    &__submit,
+    &__danger {
+        display: grid;
+        place-content: center;
+        max-width: 300px;
+        padding: .2rem 1rem;
+        border-radius: 4px;
+        color: $white;
+    }
+
+    &__submit {
+        background-color: color.adjust($clr_dark, $lightness: 30%);
+
+
+        &:hover,
+        &:focus {
+            background-color: color.adjust($clr_dark, $lightness: 40%);
+        }
+
+    }
+
+    &__danger {
+        background-color: red;
+
+        &:hover,
+        &:focus {
+            background-color: color.adjust(red, $lightness: -20%);
+        }
+    }
+
+}

@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block title %}Log in{% endblock %} {% block body %}
+<div class="form-container">
+    <div class="form-wrapper">
+        <div class="form-background">
+            <div class="form-wrapper__qr">
+
+                {% if user_name %}
+                {% if user_is_2fa != 1 %}
+                <div class="form-wrapper__lead">
+                    <p>Hallo {{ user_name }}!</p>
+
+
+                </div>
+                <div class="form__group">
+                    <p>Schön, dass Du dich angemeldest!</p>
+
+                </div>
+
+                <div class="form__group">
+                    <p>Scanne bitte den QR-Code mit deinem Authenticator-App:</p>
+                </div>
+                <div class="form__group">
+                    <img src="{{ qr_code }}" alt="2FA QR Code">
+                </div>
+
+                {% else %}
+                <div class="form-wrapper__lead">
+                    <p>Hallo {{ user_name }}!</p>
+
+                </div>
+                <div class="form__group">
+                    <p>Two-Factor Login.</p>
+                </div>
+                {% endif %}
+            </div>
+            <form method="POST" action="/login/verify" class="form light" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <label>Geben Sie den Code aus Ihrem Athentikator-App ein:</label>
+                {{ csrf_field() }}
+                <input class="form__input" type="text" name="two_fa_code" maxlength="6" placeholder="6-stelliger Code"
+                    required autofocus>
+                <button class="btn btn__submit" type="submit">Verify & Login</button>
+            </form>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

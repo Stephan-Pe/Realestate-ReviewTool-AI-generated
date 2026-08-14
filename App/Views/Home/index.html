@@ -1,0 +1,757 @@
+{% extends "base.html" %}
+
+{% block title %}Immobilien-Reviewtool — Marktwertschätzung Graubünden{% endblock %}
+
+{% block body %}
+<main class="review-main">
+    <div class="review-main__wrapper">
+
+        <!-- Flash Messages -->
+        {% for message in flash_messages %}
+        <div class="review-flash review-flash--{{ message.type }}">
+            <i class="fas {{ message.type == 'success' ? 'fa-check-circle' : (message.type == 'warning' ? 'fa-exclamation-circle' : 'fa-info-circle') }}"></i>
+            {{ message.text }}
+        </div>
+        {% endfor %}
+
+        <!-- Calculation result from session (after form POST) -->
+        {% if _calc_result %}
+        <div id="valuationResult" class="review-result" style="display:block;">
+            <div class="review-result__header">
+                <h2><i class="fas fa-chart-line"></i> Bewertungsergebnis</h2>
+                <span id="resultLocation" class="review-result__location">{{ _calc_result.location_name }} ({{ _calc_result.plz }})</span>
+            </div>
+            <div class="review-result__grid">
+                <div class="review-result__card">
+                    <span class="review-result__card-label">Preis pro m²</span>
+                    <span class="review-result__card-value">{{ _calc_result.price_per_sqm|number_format(2, '.', ' ') }} CHF/m²</span>
+                </div>
+                <div class="review-result__card review-result__card--highlight">
+                    <span class="review-result__card-label">Geschätzter Marktwert</span>
+                    <span class="review-result__card-value">{{ _calc_result.total_value|number_format(2, '.', ' ') }} CHF</span>
+                </div>
+                <div class="review-result__card">
+                    <span class="review-result__card-label">Bewertungsspanne</span>
+                    <span class="review-result__card-value">
+                        {{ ((_calc_result.total_value * 0.9)|number_format(0, '.', ' ')) }} –
+                        {{ ((_calc_result.total_value * 1.1)|number_format(0, '.', ' ')) }} CHF
+                    </span>
+                </div>
+            </div>
+            <div class="review-result__factors">
+                <h3><i class="fas fa-sliders-h"></i> Faktoren</h3>
+                <div class="review-result__factor-row">
+                    <span>Standortfaktor:</span>
+                    <span>{{ _calc_result.location_factor|number_format(3, '.', ',') }}</span>
+                </div>
+                <div class="review-result__factor-row">
+                    <span>Zustandsfaktor:</span>
+                    <span>{{ _calc_result.condition_factor|number_format(3, '.', ',') }}</span>
+                </div>
+                <div class="review-result__factor-row">
+                    <span>Ausstattungsfaktor:</span>
+                    <span>{{ _calc_result.equipment_factor|number_format(3, '.', ',') }}</span>
+                </div>
+            </div>
+            <div class="review-result__actions">
+                <button type="submit" class="review-btn review-btn--secondary" id="btnSave">
+                    <i class="fas fa-save"></i> Bewertung speichern
+                </button>
+                <button class="review-btn review-btn--outline" id="btnReset">
+                    <i class="fas fa-redo"></i> Neue Bewertung
+                </button>
+            </div>
+            <div class="review-result__disclaimer">
+                <i class="fas fa-info-circle"></i>
+                <p>Die Schätzung basiert auf Richtwerten und dient nur als ungefähre Orientierung.</p>
+            </div>
+        </div>
+        {% endif %}
+
+
+        <!-- Hero -->
+        <section class="review-hero">
+            <h1 class="review-hero__title">🏠 Immobilien-Reviewtool</h1>
+            <p class="review-hero__subtitle">Schätzen Sie den Marktwert Ihrer Wohnimmobilie in der Schweiz — Fokus Kanton Graubünden</p>
+        </section>
+
+        <!-- Tabs -->
+        <div class="review-tabs" id="reviewTabs">
+            <button class="review-tab active" data-tab="calculator">
+                <i class="fas fa-calculator"></i> Bewertung
+            </button>
+            <button class="review-tab" data-tab="history">
+                <i class="fas fa-history"></i> Bewertungen
+            </button>
+        </div>
+
+        <!-- Calculator Tab -->
+        <div class="review-panel active" id="panel-calculator">
+            <form id="valuationForm" class="review-form" novalidate method="POST" action="/homes/calculate">
+                <div class="review-form__grid">
+
+                    <!-- PLZ with autocomplete -->
+                    <div class="review-form__field">
+                        <label for="plz" class="review-form__label">
+                            <i class="fas fa-map-marker-alt"></i> Postleitzahl
+                        </label>
+                        <div class="review-input-wrap">
+                            <input
+                                type="text"
+                                id="plz"
+                                name="plz"
+                                class="review-form__input"
+                                placeholder="PLZ eingeben (z.B. 7000)"
+                                autocomplete="off"
+                                required
+                            />
+                            <div id="plz-suggestions" class="plz-suggestions"></div>
+                        </div>
+                        <small id="plz-hint" class="review-form__hint"></small>
+                    </div>
+                      {{ csrf_field() }}
+                    <!-- Property Type -->
+                    <div class="review-form__field">
+                        <label for="property_type" class="review-form__label">
+                            <i class="fas fa-home"></i> Objektart
+                        </label>
+                        <select id="property_type" name="property_type" class="review-form__select" required>
+                            <option value="">Bitte wählen</option>
+                            <option value="Einfamilienhaus">Einfamilienhaus</option>
+                            <option value="Mehrfamilienhaus">Mehrfamilienhaus</option>
+                            <option value="Wohnung">Wohnung</option>
+                            <option value="Reihenhaus">Reihenhaus</option>
+                            <option value="Doppelhaus">Doppelhaus</option>
+                            <option value="Grundstück">Grundstück</option>
+                        </select>
+                    </div>
+
+                    <!-- Area -->
+                    <div class="review-form__field">
+                        <label for="area" class="review-form__label">
+                            <i class="fas fa-ruler-combined"></i> Wohnfläche (m²)
+                        </label>
+                        <input
+                            type="number"
+                            id="area"
+                            name="area"
+                            class="review-form__input"
+                            placeholder="z.B. 150"
+                            min="1"
+                            step="0.5"
+                            required
+                        />
+                    </div>
+
+                    <!-- Condition -->
+                    <div class="review-form__field">
+                        <label for="condition" class="review-form__label">
+                            <i class="fas fa-hard-hat"></i> Zustand
+                        </label>
+                        <select id="condition" name="condition" class="review-form__select" required>
+                            <option value="">Bitte wählen</option>
+                            <option value="neuwertig">Neuwertig</option>
+                            <option value="renoviert">Renoviert</option>
+                            <option value="gepflegt">Gepflegt</option>
+                            <option value="sanierungsbedürftig">Sanierungsbedürftig</option>
+                            <option value="renierungsbedürftig">Renierungsbedürftig</option>
+                        </select>
+                    </div>
+
+                    <!-- Equipment -->
+                    <div class="review-form__field">
+                        <label for="equipment" class="review-form__label">
+                            <i class="fas fa-star"></i> Ausstattung
+                        </label>
+                        <select id="equipment" name="equipment" class="review-form__select" required>
+                            <option value="">Bitte wählen</option>
+                            <option value="luxus">Luxus</option>
+                            <option value="gehoben">Gehoben</option>
+                            <option value="standard">Standard</option>
+                            <option value="einfach">Einfach</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="review-form__field review-form__field--submit">
+                        <button type="submit" class="review-btn review-btn--primary" id="calcBtn">
+                            <i class="fas fa-calculator"></i> Bewertung durchführen
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Loading spinner -->
+            <div id="calcLoader" class="review-loader" style="display:none;">
+                <div class="review-loader__spinner"></div>
+                <p>Berechne Bewertung…</p>
+            </div>
+
+            <!-- Results -->
+            <div id="valuationResult" class="review-result" style="display:none;">
+                <div class="review-result__header">
+                    <h2><i class="fas fa-chart-line"></i> Bewertungsergebnis</h2>
+                    <span id="resultLocation" class="review-result__location"></span>
+                </div>
+
+                <div class="review-result__grid">
+                    <div class="review-result__card">
+                        <span class="review-result__card-label">Preis pro m²</span>
+                        <span class="review-result__card-value" id="resultPricePerSqm"></span>
+                    </div>
+                    <div class="review-result__card review-result__card--highlight">
+                        <span class="review-result__card-label">Geschätzter Marktwert</span>
+                        <span class="review-result__card-value" id="resultTotalValue"></span>
+                    </div>
+                    <div class="review-result__card">
+                        <span class="review-result__card-label">Bewertungsspanne</span>
+                        <span class="review-result__card-value" id="resultRange"></span>
+                    </div>
+                </div>
+
+                <div class="review-result__factors">
+                    <h3><i class="fas fa-sliders-h"></i> Faktoren</h3>
+                    <div class="review-result__factor-row">
+                        <span>Standortfaktor:</span>
+                        <span id="resultLocFactor"></span>
+                    </div>
+                    <div class="review-result__factor-row">
+                        <span>Zustandsfaktor:</span>
+                        <span id="resultCondFactor"></span>
+                    </div>
+                    <div class="review-result__factor-row">
+                        <span>Ausstattungsfaktor:</span>
+                        <span id="resultEquipFactor"></span>
+                    </div>
+                </div>
+
+                <div class="review-result__actions">
+                    <button type="submit" class="review-btn review-btn--secondary" id="btnSave">
+                        <i class="fas fa-save"></i> Bewertung speichern
+                    </button>
+                    <button class="review-btn review-btn--outline" id="btnReset">
+                        <i class="fas fa-redo"></i> Neue Bewertung
+                    </button>
+                </div>
+
+                <!-- Hidden form for saving valuation -->
+                <form id="saveForm" action="/homes/save" method="POST" style="display:none;">
+                    <input type="hidden" name="plz" id="save_plz" />
+                    <input type="hidden" name="location_name" id="save_location_name" />
+                    <input type="hidden" name="property_type" id="save_property_type" />
+                    <input type="hidden" name="area" id="save_area" />
+                    <input type="hidden" name="condition" id="save_condition" />
+                    <input type="hidden" name="equipment" id="save_equipment" />
+                    <input type="hidden" name="price_per_sqm" id="save_price_per_sqm" />
+                    <input type="hidden" name="total_value" id="save_total_value" />
+                    <input type="hidden" name="location_factor" id="save_location_factor" />
+                    <input type="hidden" name="condition_factor" id="save_condition_factor" />
+                    <input type="hidden" name="equipment_factor" id="save_equipment_factor" />
+                    <input type="hidden" name="country" id="save_country" value="CH" />
+                </form>
+
+                <div class="review-result__disclaimer">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Die Schätzung basiert auf Richtwerten und dient nur als ungefähre Orientierung. Für eine verbindliche Bewertung wenden Sie sich bitte an einen zertifizierten Gutachter.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div class="review-panel" id="panel-history">
+            <div class="review-history">
+                <div class="review-history__search">
+                    <input
+                        type="text"
+                        id="historySearch"
+                        class="review-form__input"
+                        placeholder="Suche nach PLZ, Ort oder Objektart…"
+                    />
+                    <i class="fas fa-search"></i>
+                </div>
+
+                <div id="historyList" class="review-history__list">
+                    <p class="review-history__empty">Lade Bewertungen…</p>
+                </div>
+
+                <div id="historyPagination" class="review-pagination" style="display:none;">
+                    <button class="review-btn review-btn--outline" id="prevPage">← Zurück</button>
+                    <span id="pageInfo" class="review-pagination__info"></span>
+                    <button class="review-btn review-btn--outline" id="nextPage">Weiter →</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block javascripts %}
+
+
+<style>
+/* ======================== REVIEW TOOL STYLES ======================== */
+:root {
+    --review-primary: #1e6091;
+    --review-primary-light: #e8f4fd;
+    --review-accent: #2a9d8f;
+    --review-accent-light: #e6f7f4;
+    --review-warning: #e9c46a;
+    --review-danger: #e76f51;
+    --review-success: #2a9d8f;
+    --review-bg: #f8f9fa;
+    --review-card-bg: #ffffff;
+    --review-text: #264653;
+    --review-text-light: #6c757d;
+    --review-border: #dee2e6;
+    --review-radius: 12px;
+    --review-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --review-shadow-hover: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+.review-main {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.review-hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    background: linear-gradient(135deg, var(--review-primary) 0%, var(--review-accent) 100%);
+    border-radius: var(--review-radius);
+    color: #fff;
+    margin-bottom: 2rem;
+}
+
+.review-hero__title {
+    font-size: 2.2rem;
+    margin: 0 0 0.5rem;
+    font-weight: 700;
+}
+
+.review-hero__subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Tabs */
+.review-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0;
+    border-bottom: 2px solid var(--review-border);
+}
+
+.review-tab {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--review-text-light);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.review-tab:hover { color: var(--review-primary); }
+.review-tab.active {
+    color: var(--review-primary);
+    border-bottom-color: var(--review-primary);
+}
+
+.review-panel { display: none; }
+.review-panel.active { display: block; }
+
+/* Form */
+.review-form {
+    background: var(--review-card-bg);
+    border-radius: var(--review-radius);
+    padding: 2rem;
+    box-shadow: var(--review-shadow);
+}
+
+.review-form__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.review-form__field--submit {
+    grid-column: 1 / -1;
+    text-align: center;
+}
+
+.review-form__label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    color: var(--review-text);
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+}
+
+.review-form__label i { color: var(--review-primary); }
+
+.review-input-wrap { position: relative; }
+
+.review-form__input,
+.review-form__select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--review-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--review-text);
+    background: #fff;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.review-form__input:focus,
+.review-form__select:focus {
+    outline: none;
+    border-color: var(--review-primary);
+}
+
+.review-form__hint {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--review-text-light);
+    font-size: 0.85rem;
+}
+
+/* PLZ Suggestions */
+.plz-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--review-border);
+    border-radius: 0 0 8px 8px;
+    box-shadow: var(--review-shadow);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.plz-suggestion {
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.plz-suggestion:hover {
+    background: var(--review-primary-light);
+    color: var(--review-primary);
+}
+
+/* Buttons */
+.review-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.review-btn--primary {
+    background: var(--review-primary);
+    color: #fff;
+}
+.review-btn--primary:hover { background: #164d75; }
+
+.review-btn--secondary {
+    background: var(--review-accent);
+    color: #fff;
+}
+.review-btn--secondary:hover { background: #21867a; }
+
+.review-btn--outline {
+    background: transparent;
+    border-color: var(--review-primary);
+    color: var(--review-primary);
+}
+.review-btn--outline:hover { background: var(--review-primary-light); }
+
+.review-btn--danger {
+    border-color: var(--review-danger);
+    color: var(--review-danger);
+}
+.review-btn--danger:hover { background: #fff5f3; }
+
+.review-btn--sm {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    border: 1px solid var(--review-border);
+    background: #fff;
+    color: var(--review-text-light);
+    border-radius: 6px;
+}
+.review-btn--sm:hover {
+    border-color: var(--review-primary);
+    color: var(--review-primary);
+    background: var(--review-primary-light);
+}
+
+/* Loader */
+.review-loader {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem;
+    gap: 1rem;
+}
+
+.review-loader__spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--review-border);
+    border-top-color: var(--review-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Result */
+.review-result {
+    margin-top: 2rem;
+    background: var(--review-card-bg);
+    border-radius: var(--review-radius);
+    box-shadow: var(--review-shadow);
+    overflow: hidden;
+}
+
+.review-result__header {
+    background: linear-gradient(135deg, var(--review-primary) 0%, var(--review-accent) 100%);
+    color: #fff;
+    padding: 1.5rem 2rem;
+}
+
+.review-result__header h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.4rem;
+}
+
+.review-result__location {
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.review-result__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+}
+
+.review-result__card {
+    background: var(--review-bg);
+    border-radius: 8px;
+    padding: 1.2rem;
+    text-align: center;
+}
+
+.review-result__card--highlight {
+    background: var(--review-accent-light);
+    border: 2px solid var(--review-accent);
+}
+
+.review-result__card-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--review-text-light);
+    margin-bottom: 0.5rem;
+}
+
+.review-result__card-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--review-text);
+}
+
+.review-result__factors {
+    padding: 0 2rem 1.5rem;
+}
+
+.review-result__factors h3 {
+    font-size: 1.1rem;
+    color: var(--review-text);
+    margin: 0 0 1rem;
+}
+
+.review-result__factor-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--review-border);
+    font-size: 0.95rem;
+}
+
+.review-result__factor-row:last-child { border-bottom: none; }
+
+.review-result__actions {
+    display: flex;
+    gap: 1rem;
+    padding: 0 2rem 1.5rem;
+    flex-wrap: wrap;
+}
+
+.review-result__disclaimer {
+    margin: 0 2rem 1.5rem;
+    padding: 1rem;
+    background: #fff8e1;
+    border-left: 4px solid var(--review-warning);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9rem;
+    color: var(--review-text);
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+/* History */
+.review-history__search {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.review-history__search i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--review-text-light);
+}
+
+.review-history__search input {
+    padding-left: 2.5rem;
+}
+
+.review-history__list {
+    display: grid;
+    gap: 1rem;
+}
+
+.review-history__card {
+    background: var(--review-card-bg);
+    border-radius: var(--review-radius);
+    box-shadow: var(--review-shadow);
+    overflow: hidden;
+}
+
+.review-history__card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    background: var(--review-primary-light);
+}
+
+.review-history__badge {
+    background: var(--review-primary);
+    color: #fff;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.review-history__card-body {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+    color: var(--review-text-light);
+    flex-wrap: wrap;
+}
+
+.review-history__card-body span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.review-history__card-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.8rem 1.2rem;
+    border-top: 1px solid var(--review-border);
+    justify-content: flex-end;
+}
+
+.review-history__empty {
+    text-align: center;
+    padding: 3rem;
+    color: var(--review-text-light);
+}
+
+.review-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
+}
+
+.review-pagination__info {
+    color: var(--review-text-light);
+    font-size: 0.9rem;
+}
+
+/* Flash Messages */
+.review-flash {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+}
+.review-flash--success {
+    background: var(--review-accent-light);
+    color: var(--review-accent);
+    border-left: 4px solid var(--review-accent);
+}
+.review-flash--warning {
+    background: #fff8e1;
+    color: var(--review-warning);
+    border-left: 4px solid var(--review-warning);
+}
+.review-flash--error {
+    background: #fff5f3;
+    color: var(--review-danger);
+    border-left: 4px solid var(--review-danger);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .review-hero__title { font-size: 1.6rem; }
+    .review-form { padding: 1.2rem; }
+    .review-form__grid { grid-template-columns: 1fr; }
+    .review-result__grid { grid-template-columns: 1fr; }
+    .review-result__actions { flex-direction: column; }
+    .review-result__actions .review-btn { width: 100%; justify-content: center; }
+    .review-history__card-body { flex-direction: column; gap: 0.5rem; }
+}
+</style>
+{% endblock %}

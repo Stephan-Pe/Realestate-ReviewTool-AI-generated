@@ -1,0 +1,97 @@
+{% extends "base.html" %} {% block title %}Profile{% endblock %} {% block
+footer%}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+<script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js" defer></script>
+
+
+<script>
+  $(document).ready(function () {
+    let userId = "{{ user.id }}";
+    /**
+     * Validate the form
+     */
+    $("#formProfile").validate({
+      rules: {
+        name: "required",
+        email: {
+          required: true,
+          email: true,
+          remote: {
+            url: "/account/validate-email",
+            data: {
+              ignore_id: function () {
+                return userId;
+              },
+            },
+          },
+        },
+        password: {
+          minlength: 6,
+          validPassword: true,
+        },
+      },
+      messages: {
+        email: {
+          remote: "email already taken",
+        },
+      },
+    });
+  });
+</script>
+
+{% endblock %} {% block body%}
+<div class="form-wrapper">
+  <h1 class="form-wrapper__lead">Profil</h1>
+  {% if user.errors is not empty %}
+
+  <p>Errors:</p>
+  <ul>
+    {% for error in user.errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <form method="post" action="/profile/update" autocomplete="on" id="formProfile" data-form>
+    <div class="form__group">
+      <label for="inputName" class="form-label">Name</label>
+      <input name="user_name" class="form__input" id="inputName" minlength="2" value="{{user.user_name}}" required />
+    </div>
+    {% if current_user.user_role == 'admin' %}
+    <div class="form__group">
+
+      <label for="inputEmail" class="form-label">Email Address</label>
+      <input name="user_email" type="email" class="form__input" id="inputEmail" pattern="[a-zA-Z0-9._&'*+-]+@[a-zA-Z0-9 &-]+\.[a-z]{2,}"
+        value="{{user.user_email}}" required />
+    </div>
+    {% else %} <div class="form__group">
+      <p>Angemeldet als {{user.user_email}}</p>
+      <small>Zum ändern Ihrer Emailadresse Account löschen und neu
+        registrieren.</small>
+    </div>
+    {% endif %}
+    <div class="form__group">
+      <label for="inputPassword" class="form-label">Password</label>
+      <input type="password" name="user_password" pattern="^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[£@#$%^&+=]).*" class="form__input"
+        id="inputPassword" placeholder="*********" autocomplete="off" aria-describedby="info-block" data-passwordedit />
+      <small data-errormsg=""></small>
+      <span id="togglePassword" data-toggleedit><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+          <!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) -->
+          <path
+            d="M288 144a110.94 110.94 0 0 0-31.24 5 55.4 55.4 0 0 1 7.24 27 56 56 0 0 1-56 56 55.4 55.4 0 0 1-27-7.24A111.71 111.71 0 1 0 288 144zm284.52 97.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400c-98.65 0-189.09-55-237.93-144C98.91 167 189.34 112 288 112s189.09 55 237.93 144C477.1 345 386.66 400 288 400z" />
+        </svg></span>
+      <span id="info-block" class="info-element">Leave blank to keep current
+        password</span>
+    </div>
+    <div class="btn__group">
+      <button type="submit" class="btn btn__submit">Save</button>
+    </div>
+    <div class="btn__group">
+      <a class="btn btn__link" href="/profile/show">Cancel</a>
+    </div>
+  </form>
+
+
+</div>
+{% endblock %}

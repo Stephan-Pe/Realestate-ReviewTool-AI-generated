@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Bewertung bearbeiten #{{ valuation.id }} — Immobilien-Reviewtool{% endblock %}
+
+{% block body %}
+<main class="review-main">
+    <div class="review-main__wrapper">
+
+        <!-- Flash Messages -->
+        {% for message in flash_messages() %}
+        <div class="review-flash review-flash--{{ message.type }}">
+            <i class="fas {{ message.type == 'success' ? 'fa-check-circle' : (message.type == 'warning' ? 'fa-exclamation-circle' : 'fa-info-circle') }}"></i>
+            {{ message.text }}
+        </div>
+        {% endfor %}
+
+        <a href="/homes/show/{{ valuation.id }}" class="review-back-link">
+            <i class="fas fa-arrow-left"></i> Zurück
+        </a>
+
+        <div class="review-form" style="margin-top: 1rem;">
+            <h2 style="margin: 0 0 1.5rem;"><i class="fas fa-edit"></i> Bewertung bearbeiten</h2>
+
+            <form id="editForm" class="review-form__grid" novalidate method="POST" action="/homes/update/{{ valuation.id }}">
+                <input type="hidden" name="id" value="{{ valuation.id }}" />
+
+                <div class="review-form__field">
+                    <label class="review-form__label">
+                        <i class="fas fa-map-marker-alt"></i> Postleitzahl
+                    </label>
+                    <div class="review-input-wrap">
+                        <input type="text" id="plz" name="plz" class="review-form__input" value="{{ valuation.plz }}" required />
+                        <div id="plz-suggestions" class="plz-suggestions"></div>
+                    </div>
+                    <small id="plz-hint" class="review-form__hint">{{ valuation.location_name }}</small>
+                </div>
+
+                <div class="review-form__field">
+                    <label class="review-form__label">
+                        <i class="fas fa-home"></i> Objektart
+                    </label>
+                    <select id="property_type" name="property_type" class="review-form__select" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="Einfamilienhaus" {{ valuation.property_type == 'Einfamilienhaus' ? 'selected' : '' }}>Einfamilienhaus</option>
+                        <option value="Mehrfamilienhaus" {{ valuation.property_type == 'Mehrfamilienhaus' ? 'selected' : '' }}>Mehrfamilienhaus</option>
+                        <option value="Wohnung" {{ valuation.property_type == 'Wohnung' ? 'selected' : '' }}>Wohnung</option>
+                        <option value="Reihenhaus" {{ valuation.property_type == 'Reihenhaus' ? 'selected' : '' }}>Reihenhaus</option>
+                        <option value="Doppelhaus" {{ valuation.property_type == 'Doppelhaus' ? 'selected' : '' }}>Doppelhaus</option>
+                        <option value="Grundstück" {{ valuation.property_type == 'Grundstück' ? 'selected' : '' }}>Grundstück</option>
+                    </select>
+                </div>
+
+                <div class="review-form__field">
+                    <label class="review-form__label">
+                        <i class="fas fa-ruler-combined"></i> Wohnfläche (m²)
+                    </label>
+                    <input type="number" id="area" name="area" class="review-form__input" value="{{ valuation.area }}" min="1" step="0.5" required />
+                </div>
+
+                <div class="review-form__field">
+                    <label class="review-form__label">
+                        <i class="fas fa-hard-hat"></i> Zustand
+                    </label>
+                    <select id="condition" name="condition" class="review-form__select" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="neuwertig" {{ valuation.condition == 'neuwertig' ? 'selected' : '' }}>Neuwertig</option>
+                        <option value="renoviert" {{ valuation.condition == 'renoviert' ? 'selected' : '' }}>Renoviert</option>
+                        <option value="gepflegt" {{ valuation.condition == 'gepflegt' ? 'selected' : '' }}>Gepflegt</option>
+                        <option value="sanierungsbedürftig" {{ valuation.condition == 'sanierungsbedürftig' ? 'selected' : '' }}>Sanierungsbedürftig</option>
+                        <option value="renierungsbedürftig" {{ valuation.condition == 'renierungsbedürftig' ? 'selected' : '' }}>Renierungsbedürftig</option>
+                    </select>
+                </div>
+
+                <div class="review-form__field">
+                    <label class="review-form__label">
+                        <i class="fas fa-star"></i> Ausstattung
+                    </label>
+                    <select id="equipment" name="equipment" class="review-form__select" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="luxus" {{ valuation.equipment == 'luxus' ? 'selected' : '' }}>Luxus</option>
+                        <option value="gehoben" {{ valuation.equipment == 'gehoben' ? 'selected' : '' }}>Gehoben</option>
+                        <option value="standard" {{ valuation.equipment == 'standard' ? 'selected' : '' }}>Standard</option>
+                        <option value="einfach" {{ valuation.equipment == 'einfach' ? 'selected' : '' }}>Einfach</option>
+                    </select>
+                </div>
+
+                <div class="review-form__field review-form__field--submit">
+                    <button type="submit" class="review-btn review-btn--primary">
+                        <i class="fas fa-save"></i> Änderungen speichern
+                    </button>
+                </div>
+            </form>
+
+            <div id="editResult" class="review-result" style="display:none; margin-top: 1.5rem;"></div>
+        </div>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block javascripts %}
+<!-- PLZ autocomplete still uses fetch for live search -->
+<script>
+(function() {
+    const plzInput = document.getElementById('plz');
+    if (!plzInput) return;
+    const suggestionsBox = document.getElementById('plz-suggestions');
+    let plzTimeout = null;
+
+    plzInput.addEventListener('input', function () {
+        const query = this.value.trim();
+        clearTimeout(plzTimeout);
+        if (query.length < 2) { suggestionsBox.innerHTML = ''; return; }
+        plzTimeout = setTimeout(() => searchPLZ(query), 250);
+    });
+
+    plzInput.addEventListener('blur', () => {
+        setTimeout(() => suggestionsBox.innerHTML = '', 200);
+    });
+
+    async function searchPLZ(query) {
+        try {
+            const res = await fetch('/homes/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            renderSuggestions(data);
+        } catch (e) { console.error(e); }
+    }
+
+    function renderSuggestions(results) {
+        if (!results.length) { suggestionsBox.innerHTML = ''; return; }
+        suggestionsBox.innerHTML = results.map(r =>
+            `<div class="plz-suggestion" data-plz="${r.plz}" data-city="${r.name}">
+                ${r.plz} — ${r.name}
+            </div>`
+        ).join('');
+        suggestionsBox.querySelectorAll('.plz-suggestion').forEach(el => {
+            el.addEventListener('click', () => {
+                plzInput.value = el.dataset.plz;
+                suggestionsBox.innerHTML = '';
+                document.getElementById('plz-hint').textContent = el.dataset.city;
+            });
+        });
+    }
+})();
+</script>
+{% endblock %}
+
+{% endblock %}

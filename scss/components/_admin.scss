@@ -1,0 +1,216 @@
+@use "../abstracts/colors" as *;
+@use "../abstracts/helpers" as *;
+@use "../abstracts/breakpoints" as *;
+@use "../abstracts/mixins" as *;
+
+
+.container-admin {
+    min-height: 100dvh;
+
+    &__side {
+        @include color-scheme($scheme-light...);
+        font-size: clamp(1.1rem, 0.998rem + 0.4183vw, 1.5rem);
+
+        padding: .4rem 0;
+
+        a {
+            color: inherit;
+            margin-left: .5rem;
+            line-height: 1.8;
+        }
+    }
+}
+
+
+.admin-list {
+    @include color-scheme($scheme-card...);
+    padding: 2rem;
+    border-bottom: 2px solid $gray;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    &__lead {
+        margin-bottom: 1.5rem;
+        font-size: clamp(1.4rem, 1.2471rem + 0.6275vw, 2rem);
+        font-weight: 600;
+
+        small {
+            font-size: clamp(0.7rem, 0.649rem + 0.2092vw, 0.9rem);
+        }
+    }
+
+    &__gallery {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+
+        img {
+            width: max(10%, 90px);
+        }
+    }
+}
+
+
+.adminpanel {
+
+    display: flex;
+    flex-direction: column;
+
+    &__sale,
+    &__user {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px dotted $clr_acc;
+
+        &--text {
+            line-height: 1.8;
+            font-size: clamp(1.1rem, 0.998rem + 0.4183vw, 1.5rem);
+        }
+
+        &--image {
+            overflow: hidden;
+            align-self: center;
+
+            img {
+                width: 140px;
+                box-shadow: $boxShadowSmall;
+            }
+        }
+
+        &--button {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+
+        }
+
+        &--buttonside {
+            width: 30%;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+
+        }
+
+        &--buttonlink {
+            padding: 1.5rem .5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+
+
+}
+
+@include media('tablet') {
+    .adminpanel {
+
+        &__sale,
+        &__user {
+
+            flex-direction: row;
+            justify-content: space-between;
+
+            &--text {
+                width: 45%;
+            }
+
+            &--image {
+                width: 20%;
+
+                img {
+                    width: 140px;
+                }
+            }
+
+            &--button {
+                width: 35%;
+                justify-content: space-around;
+
+            }
+        }
+
+
+
+    }
+}
+
+
+@include media('desktop') {
+    .container-admin {
+        display: grid;
+        grid-template-columns: 20% 80%;
+        grid-template-rows: auto;
+        grid-template-areas:
+            'info info'
+            'side one'
+            'side two'
+            'side three';
+
+        &__side {
+            grid-area: side;
+
+
+
+            ul li {
+                border-bottom: 1px solid $gold;
+            }
+        }
+
+        &__info {
+            grid-area: info;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 80px;
+        }
+    }
+
+    .adminpanel {
+
+        &__sale,
+        &__user {
+
+            flex-direction: row;
+
+            &--text {
+                width: 40%;
+            }
+
+            &--image {
+                width: 30%;
+
+                img {
+                    width: 140px;
+                }
+            }
+
+            &--button {
+                width: 30%;
+                justify-content: space-between;
+                padding: 1rem 1rem 0;
+            }
+
+        }
+    }
+
+
+
+    #saleslist {
+        grid-area: one;
+
+    }
+
+    #gallerylist {
+        grid-area: two;
+    }
+
+    #userslist {
+        grid-area: three;
+    }
+
+}

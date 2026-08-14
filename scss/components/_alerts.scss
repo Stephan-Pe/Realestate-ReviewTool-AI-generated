@@ -1,0 +1,25 @@
+.alert{
+    transition: all 0.5s ease;
+    font-size: 1.4rem;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    z-index: 9999;
+    display:flex;
+    gap: 1rem;
+    align-items: center;
+      &:empty {
+        display: none;
+      }
+}
+.alert-success {
+    background-color: aquamarine;
+}
+.alert-warning {
+    background-color: orange;
+}
+.error {
+    color: orangered;
+}

@@ -1,0 +1,18 @@
+{% extends "base.html" %} {% block title %}Log in{% endblock %} {% block body %}
+<div class="form-wrapper">
+    <h3>Zwei-Faktor-Authentifizierung</h3>
+    <p>Bitte geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein.</p>
+
+    <form method="POST" action="/login/confirmed">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <div class="form-group">
+            <label for="two_fa_code">6-stelliger Code:</label>
+            <input type="text" id="two_fa_code" name="two_fa_code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+                required autofocus>
+        </div>
+
+        <button type="submit">Verifizieren</button>
+    </form>
+</div>
+{% endblock %}

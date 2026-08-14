@@ -1,0 +1,19 @@
+# Remove the question mark from the request but maintain the query string
+
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Exclude specific files from the rewriting rule
+RewriteCond %{REQUEST_URI} !^/sw\.js$
+RewriteCond %{REQUEST_URI} !^/manifest\.json$
+
+# RewriteRule ^(.*)$ index.php?/$1 [L,QSA]
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+php_value max_input_time 300
+php_value max_execution_time 300
+php_value upload_max_filesize 250M
+php_value post_max_size 300M

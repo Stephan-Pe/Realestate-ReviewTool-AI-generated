@@ -1,0 +1,15 @@
+.about {
+    background: radial-gradient(circle at 100%, #333, #333 50%, #eee 75%, #333 75%);
+    padding: 1rem;
+    color: chartreuse;
+
+    img {
+        max-width: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    p {
+        background-color: hsla(0, 53%, 0%, 0.6);
+    }
+}

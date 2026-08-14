@@ -1,0 +1,229 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block body %}
+
+<!-- if no permission show message -->
+{% if not hasRole('admin') and not hasRole('super') %}
+<div class="error-wrapper">
+    <p>You have nothing to do but...</p>
+    <p>your money is rolling 👍</p>
+</div>
+
+
+{% elseif not hasRole('manager') %}
+<div class="error-wrapper">
+    <p>Oooops {{ current_user.user_name }} you're wrong here 🔥</p>
+</div>
+{% else %}
+<div class="container-admin">
+    <div class="container-admin__info">
+
+        <p class="info-element">{{ date|format_datetime('full', 'none',
+            locale='de')
+            }}</p>
+    </div>
+    <!-- sidebar-navigation -->
+    <div class="container-admin__side">
+        <ul>
+
+            <li><a href="#saleslist">Verkauf</a></li>
+            <li><a href="#gallerylist">Gallery</a></li>
+            <li><a href="#userslist">User</a></li>
+            <!-- <li><a href="#intruderslist">Unbestätigte User</a></li> -->
+        </ul>
+    </div>
+    <div id="saleslist" class="admin-list">
+        <div class="admin-list__lead">
+            <h2>Verkaufsangebot</h2>
+        </div>
+
+        <ul class="adminpanel" user_role='list'>
+
+        </ul>
+
+        <div class="adminpanel__user--buttonlink">
+            <a class="btn btn__create" title="Angebot eröffnen" href="/homes/new">{%
+                include 'snippets/create.html' %} <span>Angebot hinzufügen</span></a>
+        </div>
+        {% if cards %}
+        <div class="admin-list__lead">
+            <h2>Angebote</h2>
+        </div>
+        {% for card in cards %}
+
+        <ul class="adminpanel" user_role='list'>
+
+            <div class="adminpanel__user">
+                <div class="adminpanel__user--text">
+                    <li>Titel: {{ card.obj_title}}</li>
+                    <li>Objekt Nummer: {{ card.main_uuid}}</li>
+                    <li>Erstellt: {{ card.created_at
+                        | format_datetime('short',
+                        'none',
+                        locale='de')}}</li>
+                    {% if card.obj_status == 0 %}
+                    <li style="color:rgb(84, 224, 3)">Status: verfügbar</li>
+                    {% elseif card.obj_status == 1 %}
+                    <li style="color:aqua;">Status: reserviert</li>
+                    {% elseif card.obj_status == 2 %}
+                    <li style="color: goldenrod;">Status: verkauft</li>
+                    {% endif %}
+                    {% if card.obj_document %}
+                    <li>Exposé: {{card.obj_document}}</li>
+                    {%else%}
+                    <li>Kein Exposé bereitgestellt</li>
+                    {%endif%}
+                </div>
+                <div class="adminpanel__sale--image">
+                    <img src="{{ card.image_main}}" alt="{{ card.obj_title}}">
+
+                </div>
+
+
+                <div class="adminpanel__sale--button">
+                    <a class="btn__icon edit" title="Angebot bearbeiten" href="/homes/edit/{{ card.main_uuid }}">{%
+                        include 'snippets/edit.html' %}
+                    </a>
+
+                    <form method="POST" action="/homes/delete">
+                        <input type="hidden" name="main_uuid" value="{{card.main_uuid}}" />
+                        <div class="btn__group">
+                            <button type="submit" title="Angebot löschen" class="btn__icon delete"
+                                onclick="return confirm(`{{ card.obj_title}} löschen?`)">{%
+                                include 'snippets/recyclebin.html' %}</button>
+                        </div>
+                    </form>
+
+                </div>
+
+
+            </div>
+            {% endfor %}
+            {% endif %}
+        </ul>
+
+
+    </div>
+    {%if galleries %}
+    {%for gallery in galleries%}
+    <div id="gallerylist" class="admin-list">
+        <div class="admin-list__lead">
+            <h2>Gallery: {{gallery.title}}</h2>
+        </div>
+        <div class="admin-list__gallery">
+            <img src="{{gallery.image0}}" alt="galleryphoto"><img src="{{gallery.image1}}" alt="galleryphoto"><img
+                src="{{gallery.image2}}" alt="galleryphoto"><img src="{{gallery.image3}}" alt="galleryphoto"><img
+                src="{{gallery.image4}}" alt="galleryphoto"><img src="{{gallery.image5}}" alt="galleryphoto">
+
+            <a class="btn__icon edit" title="Gallerie bearbeiten" href="/homes/update">{%
+                include 'snippets/edit.html' %}
+            </a>
+
+        </div>
+
+
+    </div>
+    {%endfor%}
+    {%else%}
+    <div class="admin-list" id="gallerylist">
+        <div class="admin-list__lead">
+            <h2>Keine Galleryfotos geladen</h2>
+        </div>
+        <div class="adminpanel__sale--button">
+            <a class="btn__icon create" title="Gallerie kreiren" href="/homes/gallery">{%
+                include 'snippets/create.html' %}
+            </a>
+        </div>
+    </div>
+    {%endif%}
+    <div id="userslist" class="admin-list">
+        <div class="admin-list__lead">
+            <h2>Userslist</h2><small>Durch löschen wird Zugang
+                deaktiviert</small>
+        </div>
+        <ul class="adminpanel" user_role='list'>
+            {% if users %}
+            {% for user in users %}
+            {% if hasRole('super')%}
+            <div class="adminpanel__user">
+                <div class="adminpanel__user--text">
+                    <li>Admin: {{ user.user_name}}</li>
+                    <li>Email: {{ user.user_email}}</li>
+                </div>
+            </div>
+            {%else%}
+            <div class="adminpanel__user">
+
+                <div class="adminpanel__user--text">
+
+
+
+                    <li>Name: {{ user.user_name}}</li>
+                    <li>Email: {{ user.user_email}}</li>
+                    <li>Signup: {{ user.created_at
+                        | format_datetime('short',
+                        'none',
+                        locale='de')}}</li>
+                    <li>user_role: {{ user.user_role}}</li>
+                    <li>User-ID: {{ user.id}}</li>
+                </div>
+                <form class="adminpanel__user--button" method="POST" action="/admin/users/deactivate">
+                    <input type="hidden" name="user_id" value="{{user.id}}" />
+                    <div class="btn__group">
+
+                        <button type="submit" title="User deaktivieren" class="btn__icon delete"
+                            onclick="return confirm(`User {{ user.user_name}} deaktivieren?`)">{%
+                            include 'snippets/recyclebin.html' %}</button>
+                    </div>
+                </form>
+
+
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+        </ul>
+
+
+    </div>
+    <!-- <div id="intruderlist" class="admin-list">
+        <div class="admin-list__lead">
+            <h2>Unbestätigte User</h2><small>Unbestätigter User wird
+                gelöscht</small>
+        </div>
+
+
+        <ul class="adminpanel" user_role='list'>
+            {% if intruders %}
+            {% for intruder in intruders %}
+            <div class="adminpanel__user">
+                <div class="adminpanel__user--text">
+                    <li>Name: {{ intruder.user_name}}</li>
+                    <li>Email: {{ intruder.user_email}}</li>
+                    <li>Unbestätigt seit: {{ intruder.created_at
+                        |format_datetime('short',
+                        'none',
+                        locale='de')}}</li>
+                    <li>Remote: {{ intruder.remote_addr}}</li>
+                </div>
+                <div class="adminpanel__user--image">
+
+
+                </div>
+                <form method="POST" action="/profile/delete">
+                    <input type="hidden" name="id" value="{{intruder.id}}" />
+                    <div class="btn__group">
+                        <button type="submit" class="btn delete"
+                            onclick="return confirm(`Unbestätigten User {{ intruder.user_name}} löschen?`)">{%
+                            include 'snippets/recyclebin.html' %}</button>
+                    </div>
+
+                </form>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </ul>
+        {% endif %}
+
+    </div> -->
+
+</div>
+{% endblock %}

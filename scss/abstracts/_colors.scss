@@ -1,0 +1,30 @@
+@forward 'sass:list';
+@use "sass:color";
+
+$gray: #5d5c61;
+$clr_acc_2: #5d0018;
+$clr_dark: #051622;
+$white: #ffffff;
+$gold: #dcb306;
+$clr_light: #1BA098;
+$clr_acc: #ffd235;
+
+$scheme-light: $clr_dark, $white;
+$scheme-card: $white, $clr_dark;
+$red-gradient: color.adjust($clr_acc_2, $lightness: 10%), $clr_acc_2;
+$scheme-gradient: $clr_dark, color.adjust($clr_dark, $lightness: 10%);
+$scheme-form: $clr_dark, $white;
+$scheme-form-info: $white, color.adjust($clr_dark, $lightness: 30%);
+$scheme-card-light: $white, $scheme-gradient;
+$scheme-card-contrast: $white, $clr_dark;
+$scheme-detail: $white, $clr_dark;
+$scheme-dark: $clr_acc, $clr_dark;
+$btn-scheme: $clr_acc_2, $clr_acc;
+
+.red {
+    background-color: rgba($clr_acc, .9);
+}
+
+.green {
+    background-color: rgba($clr_dark, .9);
+}

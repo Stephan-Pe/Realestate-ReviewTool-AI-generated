@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Bewertung #{{ valuation.id }} — Immobilien-Reviewtool{% endblock %}
+
+{% block body %}
+<main class="review-main">
+    <div class="review-main__wrapper">
+
+        <!-- Flash Messages -->
+        {% for message in flash_messages() %}
+        <div class="review-flash review-flash--{{ message.type }}">
+            <i class="fas {{ message.type == 'success' ? 'fa-check-circle' : (message.type == 'warning' ? 'fa-exclamation-circle' : 'fa-info-circle') }}"></i>
+            {{ message.text }}
+        </div>
+        {% endfor %}
+
+        <a href="/" class="review-back-link">
+            <i class="fas fa-arrow-left"></i> Zurück zur Bewertung
+        </a>
+
+        <div class="review-result" style="margin-top: 1.5rem;">
+            <div class="review-result__header">
+                <h2><i class="fas fa-chart-line"></i> Bewertung #{{ valuation.id }}</h2>
+                <span class="review-result__location">{{ valuation.location_name }} ({{ valuation.plz }})</span>
+            </div>
+
+            <div class="review-result__grid">
+                <div class="review-result__card">
+                    <span class="review-result__card-label">Preis pro m²</span>
+                    <span class="review-result__card-value">{{ valuation.price_per_sqm|number_format(2, '.', ' ') }} CHF/m²</span>
+                </div>
+                <div class="review-result__card review-result__card--highlight">
+                    <span class="review-result__card-label">Geschätzter Marktwert</span>
+                    <span class="review-result__card-value">{{ valuation.total_value|number_format(2, '.', ' ') }} CHF</span>
+                </div>
+                <div class="review-result__card">
+                    <span class="review-result__card-label">Bewertungsspanne</span>
+                    <span class="review-result__card-value">
+                        {{ ((valuation.total_value * 0.9)|number_format(0, '.', ' ')) }} –
+                        {{ ((valuation.total_value * 1.1)|number_format(0, '.', ' ')) }} CHF
+                    </span>
+                </div>
+            </div>
+
+            <div class="review-result__factors">
+                <h3><i class="fas fa-sliders-h"></i> Faktoren</h3>
+                <div class="review-result__factor-row">
+                    <span>Standortfaktor:</span>
+                    <span>{{ valuation.location_factor|number_format(3, '.', ',') }}</span>
+                </div>
+                <div class="review-result__factor-row">
+                    <span>Zustandsfaktor:</span>
+                    <span>{{ valuation.condition_factor|number_format(3, '.', ',') }}</span>
+                </div>
+                <div class="review-result__factor-row">
+                    <span>Ausstattungsfaktor:</span>
+                    <span>{{ valuation.equipment_factor|number_format(3, '.', ',') }}</span>
+                </div>
+            </div>
+
+            <div class="review-result__detail">
+                <h3><i class="fas fa-info-circle"></i> Details</h3>
+                <div class="review-result__detail-grid">
+                    <div><strong>Objektart:</strong> {{ valuation.property_type }}</div>
+                    <div><strong>Wohnfläche:</strong> {{ valuation.area }} m²</div>
+                    <div><strong>Zustand:</strong> {{ valuation.condition }}</div>
+                    <div><strong>Ausstattung:</strong> {{ valuation.equipment }}</div>
+                    <div><strong>PLZ:</strong> {{ valuation.plz }} — {{ valuation.location_name }}</div>
+                    <div><strong>Land:</strong> {{ valuation.country }}</div>
+                    <div><strong>Gespeichert am:</strong> {{ valuation.created_at|date('d.m.Y H:i') }}</div>
+                    {% if valuation.updated_at != valuation.created_at %}
+                    <div><strong>Letzte Änderung:</strong> {{ valuation.updated_at|date('d.m.Y H:i') }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="review-result__actions">
+                <a href="/homes/edit/{{ valuation.id }}" class="review-btn review-btn--secondary">
+                    <i class="fas fa-edit"></i> Bearbeiten
+                </a>
+                <!-- Delete form (replaces fetch DELETE) -->
+                <form method="POST" action="/homes/delete/{{ valuation.id }}" style="display:inline;"
+                      onsubmit="return confirm('Bewertung wirklich löschen?');">
+                    <button type="submit" class="review-btn review-btn--danger">
+                        <i class="fas fa-trash"></i> Löschen
+                    </button>
+                </form>
+            </div>
+
+            <div class="review-result__disclaimer">
+                <i class="fas fa-info-circle"></i>
+                <p>Die Schätzung basiert auf Richtwerten und dient nur als ungefähre Orientierung.</p>
+            </div>
+        </div>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block javascripts %}
+<style>
+.review-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--review-primary, #1e6091);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+.review-back-link:hover { text-decoration: underline; }
+.review-result__detail {
+    padding: 0 2rem 1.5rem;
+}
+.review-result__detail h3 {
+    font-size: 1.1rem;
+    color: var(--review-text, #264653);
+    margin: 0 0 1rem;
+}
+.review-result__detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.8rem;
+}
+.review-result__detail-grid div {
+    font-size: 0.95rem;
+    color: var(--review-text, #264653);
+}
+</style>
+{% endblock %}

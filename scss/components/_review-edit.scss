@@ -1,0 +1,13 @@
+@use "../abstracts/colors" as *;
+
+// Review tool — edit page (valuation edit form)
+// =========================================================
+
+// Inherits all review-index styles (form, buttons, etc.)
+// Additional / override styles specific to the edit page
+
+// The edit page reuses the .review-form, .review-form__grid,
+// .review-form__field, .review-input-wrap, .plz-suggestions,
+// .plz-suggestion, .review-btn, and .review-result components
+// from _review-index.scss — no additional rules needed unless
+// layout tweaks are required.

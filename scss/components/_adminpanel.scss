@@ -1,0 +1,86 @@
+@use "../abstracts/colors" as *;
+@use "../abstracts/breakpoints" as *;
+@use "../abstracts/mixins" as *;
+@use "../abstracts/helpers" as *;
+
+.draggable-container {
+    $draggableBorderRadius: 1rem;
+    position: fixed;
+    top: 80px;
+    left: 5dvw;
+    transition: all 350ms linear;
+
+    &__item {
+        padding: 1rem;
+        border-radius: $draggableBorderRadius;
+        display: flex;
+        flex-direction: column;
+        font-weight: 600;
+        gap: 1rem;
+
+        @include color-scheme($scheme-dark...);
+
+        &--link {
+            border: 1px solid $clr_acc;
+            padding: 1rem 0;
+            text-align: center;
+
+            svg {
+                vertical-align: middle;
+            }
+        }
+    }
+
+    a {
+        text-decoration: underline;
+        color: inherit;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+            color: $gold;
+
+            .admin__icon {
+                fill: $gold;
+            }
+        }
+    }
+
+    &__fake {
+        padding: 1rem;
+        width: 100%;
+        background-color: red;
+        color: white;
+        font-weight: 600;
+        border-radius: $draggableBorderRadius;
+        width: 20ch;
+    }
+
+}
+
+.admin__icon {
+    width: 26px;
+    fill: $clr_acc;
+}
+
+@include media('desktop') {
+    .draggable-container {
+        z-index: 10;
+        width: 160px;
+        line-height: 2;
+        top: 370px;
+        opacity: 0;
+
+        animation: $animation;
+
+        &.active {
+            transition: all 350ms linear;
+            top: 170px;
+        }
+
+        &__item {
+            padding: 1rem 1rem 2rem;
+        }
+    }
+
+}

@@ -1,0 +1,43 @@
+@use "../abstracts/colors" as *;
+
+.grid-center {
+    display: grid;
+    place-items: center;
+}
+
+.wrapper {
+    display: grid;
+    min-height: 50dvw;
+    text-align: center;
+    place-content: center;
+    gap: 1rem;
+}
+
+:root {
+    --spacer: 3%;
+}
+
+.noscroll {
+    overflow-y: hidden;
+}
+
+.spacing > * + * {
+    margin-top: var(--spacer, 2rem);
+}
+
+$boxShadowSmall: 2px 2px 3px rgba(0, 0, 0, 0.75);
+$animation: fadeIn 350ms ease-in forwards;
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

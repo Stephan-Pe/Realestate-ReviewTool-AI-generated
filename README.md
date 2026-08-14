@@ -252,7 +252,7 @@ Die Schätzung zeigt:
 
 ---
 
-## 📡 API Dokumentation PHP MVC
+## 📡 API Dokumentation PHP MVC, Grundlagen aus UDEMY online Kurs von [Dave Hollingworth](https://github.com/daveh)
 
 ### Endpunkte
 
@@ -299,9 +299,9 @@ Diese Anwendung kommuniziert über JSON-Payloads. Die PHP-MVC-Controller erfasse
 
 
         /**
-         * Add a route to the routing table
+         * Add Route to routing table
          *
-         * @param string $route  The route URL
+         * @param string $route  The URL
          * @param array  $params Parameters (controller, action, etc.)
          *
          * @return void

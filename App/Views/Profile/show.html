@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block title %}Profile{% endblock %} {% block body
+%}
+<div class="form-wrapper">
+  <h1 class="form-wrapper__lead">Profil 🤓</h1>
+
+  <ul class="form-wrapper__profile">
+    <li>Name: {{ user.user_name }}</li>
+
+    <li>email: {{ user.user_email }}</li>
+
+  </ul>
+  <div class="btn__group">
+    <a class="btn btn__link" href="/profile/edit">Edit &#xbb;</a>
+  </div>
+
+  <form method="POST" action="/profile/delete">
+    <input type="hidden" name="id" value="{{user.id}}" />
+    <div class="btn__group">
+      <button type="submit" class="btn btn__danger">Löschen</button>
+    </div>
+
+  </form>
+  <div class="btn__group">
+    <button class="btn btn__link" onclick="history.back()">&#xab; Zurück</button>
+  </div>
+</div>
+
+
+
+{% endblock %}

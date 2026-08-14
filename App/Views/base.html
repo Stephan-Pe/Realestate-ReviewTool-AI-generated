@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-control" content="public">
+    <meta name="description" content="Real Estate sale, Immobilien kauf und verkauf" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="author" content="siteart webagentur" />
+
+    <link rel="shortcut icon" type="image/svg+xml" href="/img/icons/maskable_icon_x48.png" />
+    <link rel="icon" type="apple-touch-icon" href="/img/icons/apple-touch-icon.png" />
+
+    <!-- CSS only -->
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/styles.css') }}" />
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Google reCAPTCHA CDN -->
+    <!-- <script src="https://www.google.com/recaptcha/api.js" async defer>
+    </script> -->
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+    <header class="header">
+        <nav class="nav" user_role="navigation">
+            <div class="nav__offscreen">
+
+                <a class="nav__item" href="/#home" onclick="smoothScroll('home', 500)" aria-label="Go to Home section"
+                    title="Home" id="home">Home</a>
+                <a class="nav__item" href="/#habitat" onclick="smoothScroll('habitat', 500)"
+                    aria-label="Go to Habitat section" title="Habitat">Habitat</a>
+                <a class="nav__item" href="/#location" onclick="smoothScroll('location', 500)"
+                    aria-label="Go to Standort section" title="Standort">Standort</a>
+                <a class="nav__item" href="/#contact" onclick="smoothScroll('contact', 500)"
+                    aria-label="Go to Kontakt section" title="Kontakt">Kontakt</a>
+                <a class="nav__item" href="/#plaene" onclick="smoothScroll('plaene', 500)"
+                    aria-label="Go to Refugium section" title="Refugium Meum">Refugium Meum</a>
+                {% if current_user %}
+                <a id="sign-out" class="nav__wrapper--link" href="/logout" aria-label="proceed logout"
+                    title="Logout User">{% include ('snippets/sign-out-icon.html') %}</a>
+
+                {%else%}
+                <a class="nav__item" href="/login" aria-label="Go to login page" title="login">{% include
+                    ('snippets/log-in-icon.html') %}</a>
+                {%endif%}
+                <img src="/img/logo/logo.png" alt="logo" class="nav__logo">
+            </div>
+            <div class="nav__menu" data-nav-menuBtn>
+                <span class="nav__menu--item"></span><span class="nav__menu--item"></span><span
+                    class="nav__menu--item"></span>
+            </div>
+        </nav>
+
+
+    </header>
+
+    <!-- loader-container-start -->
+    <div class="loader-container">
+        {% include ('snippets/loader.html') %}
+    </div>
+    <!-- loader-container-end -->
+
+    <!-- admin-panel start -->
+    {% for message in flash_messages %}
+    <div class="alert alert-{{ message.type }}">{{ message.body }}</div>
+    {% endfor %}
+    {% if current_user and hasRole('admin') or hasRole('super') %}
+    <div id="draggable" class="draggable-container">
+        <div class="draggable-container__item">
+            <a title="Link zur Profilseite und Admin icon" aria-label="Link zur Profilseite und admin icon" id="account"
+                class="draggable-container__item--link" href="/profile/show">
+                <svg class="admin__icon" title="admin icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512">
+                    <!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) -->
+                    <path
+                        d="M248 104c-53 0-96 43-96 96s43 96 96 96 96-43 96-96-43-96-96-96zm0 144c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zm0-240C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 448c-49.7 0-95.1-18.3-130.1-48.4 14.9-23 40.4-38.6 69.6-39.5 20.8 6.4 40.6 9.6 60.5 9.6s39.7-3.1 60.5-9.6c29.2 1 54.7 16.5 69.6 39.5-35 30.1-80.4 48.4-130.1 48.4zm162.7-84.1c-24.4-31.4-62.1-51.9-105.1-51.9-10.2 0-26 9.6-57.6 9.6-31.5 0-47.4-9.6-57.6-9.6-42.9 0-80.6 20.5-105.1 51.9C61.9 339.2 48 299.2 48 256c0-110.3 89.7-200 200-200s200 89.7 200 200c0 43.2-13.9 83.2-37.3 115.9z" />
+                </svg> &nbsp;{{current_user.user_name}}
+            </a>
+            <small>Eingelogt als: <strong>{{current_user.user_role}}</strong> </small>
+            <a title="Link zu Admin Übersicht" aria-label="Link zu Admin Übersicht" id="admin"
+                href="/admin/users/index">Seitenverwaltung
+            </a>
+        </div>
+    </div>
+    {% elseif hasRole('manager') %}
+    <div id="draggable" class="draggable-container">
+        <div class="draggable-container__fake">
+            <span>{{current_user.user_name}}</span>
+
+            <span>You are allowed to click a useless Button</span>
+            <button class="btn btn__submit">Useless</button>
+            <a title="Link zu Admin Übersicht" aria-label="Link zu Admin Übersicht" id="admin"
+                href="/admin/users/index">Seitenverwaltung
+            </a>
+        </div>
+    </div>
+
+    {% elseif current_user and hasRole('user')%}
+    <div id="draggable" class="draggable-container">
+        <div class="draggable-container__fake">
+
+            <span>Willkommen{{current_user.user_name}}!</span>
+        </div>
+    </div>
+
+    {%endif%}
+    <!-- admin-panel end -->
+    <div class="debug-panel" style="border: 2px solid #333; padding: 20px; background: #f9f9f9;">
+        <h2>Role Debugger</h2>
+        <p><strong>Current User:</strong> {{ current_user.user_name }}</p>
+        <p><strong>Assigned Role:</strong> {{ current_user.user_role }}</p>
+        <hr>
+
+        <h3>1. Positive Checks (What you CAN see)</h3>
+        <ul>
+            {% if hasRole('super') %} <li>✅ You have <strong>SUPER</strong> powers.</li> {% endif %}
+            {% if hasRole('admin') %} <li>✅ You have <strong>ADMIN</strong> powers.</li> {% endif %}
+            {% if hasRole('manager') %} <li>✅ You have <strong>MANAGER</strong> powers.</li> {% endif %}
+            {% if hasRole('user') %} <li>✅ You have <strong>USER</strong> powers.</li> {% endif %}
+        </ul>
+
+        <h3>2. Negative Checks (What you ARE NOT)</h3>
+        <ul style="color: #d9534f;">
+            {% if not hasRole('super') %}
+            <li>🚫 You are <strong>NOT</strong> a Super.</li>
+            {% endif %}
+
+            {% if not hasRole('admin') %}
+            <li>🚫 You are <strong>NOT</strong> an Admin.</li>
+            {% endif %}
+
+            {% if not hasRole('manager') %}
+            <li>🚫 You are <strong>NOT</strong> a Manager.</li>
+            {% endif %}
+
+            {% if not hasRole('user') %}
+            <li>🚫 You are <strong>NOT</strong> even a basic User (Guest).</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="container">
+
+        {% block body %}
+
+        <!-- this is where the app goes-->
+
+        {% endblock %}
+    </div>
+    <button class="totop__btn" onclick="smoothScroll('home', 1000)"><svg xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) -->
+            <path
+                d="M240.971 130.524l194.343 194.343c9.373 9.373 9.373 24.569 0 33.941l-22.667 22.667c-9.357 9.357-24.522 9.375-33.901.04L224 227.495 69.255 381.516c-9.379 9.335-24.544 9.317-33.901-.04l-22.667-22.667c-9.373-9.373-9.373-24.569 0-33.941L207.03 130.525c9.372-9.373 24.568-9.373 33.941-.001z" />
+        </svg></button>
+
+    <footer class="footer">
+        <button class="btn btn__link" id="impressumBtn">Impressum</button>
+        <p>&copy; Setup with Gulp by Stephan Petersen</p>
+
+    </footer>
+
+    <script>
+        function smoothScroll(targetId, duration) {
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                const targetOffset = targetElement.offsetTop;
+                const initialOffset = window.pageYOffset;
+                const distance = targetOffset - initialOffset;
+                const startTime = performance.now();
+
+                function scrollStep(timestamp) {
+                    const elapsed = timestamp - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easing = easeInOutQuad(progress);
+                    window.scrollTo(0, initialOffset + distance * easing);
+
+                    if (elapsed < duration) {
+                        requestAnimationFrame(scrollStep);
+                    }
+                }
+
+                function easeInOutQuad(t) {
+                    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+                }
+
+                requestAnimationFrame(scrollStep);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            // var parallaxElements = document.querySelectorAll('.parallax__image, .parallax__text');
+
+            // parallaxElements.forEach(function (element, index) {
+            //   window.addEventListener('scroll', function () {
+            //     var scroll = window.scrollY;
+            //     var speedMultiplier = index % 2 === 0 ? 0.2 : -0.2; // Adjust the speed for alternating elements
+            //     element.style.transform = 'translateY(' + (scroll * speedMultiplier) + 'px)';
+            //   });
+            // });
+        });
+
+    </script>
+    <!-- build:js -->
+    <script type="module" src="{{ asset('js/main.min.js') }}"></script>
+    <!-- endbuild -->
+
+
+
+    {% block footer %} {% endblock %}
+</body>
+
+</html>

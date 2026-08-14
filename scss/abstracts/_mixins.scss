@@ -1,0 +1,97 @@
+@use './colors' as *;
+@use 'sass:list';
+@use "sass:color";
+
+@mixin color-scheme($text, $bg) {
+
+    // if we have a bg color, then set a bg-color
+    // if we have multiple bg-color set a gradient
+    @if list.length($bg)==1 {
+        background-color: $bg;
+    }
+
+    @else {
+        background-image: linear-gradient(to top left, $bg);
+    }
+
+    color: $text;
+}
+
+@mixin contact-before {
+    position: absolute;
+    display: block;
+    width: 100%;
+    color: $white;
+    font-size: clamp(1.2rem, 1rem + 3vw, 1.4rem);
+    left: 0;
+    bottom: 0;
+
+    &:hover,
+    &:focus {
+        color: $compone;
+    }
+}
+
+$btn-radius: 4px;
+$btn-padding: .5rem 1.8rem;
+$btn-padding-small: .5rem 2rem;
+$max-btn-width: 300px;
+
+@mixin button-regular($text, $bg, $gradient, $hover) {
+
+    // if we have a bg color, then set a bg-color
+    // if we have multiple bg-color set a gradient
+    @if list.length($bg)==1 {
+        background-color: $bg;
+    }
+
+    background: linear-gradient(to top right, $gradient, $bg , color.adjust($bg, $lightness: 10%));
+    //max-width: $max-btn-width;
+    display: inline-block;
+    padding: $btn-padding;
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: 1.5px;
+    color: $text;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+        color: $hover;
+        background-color: $text;
+        transition: all 0.3s ease;
+    }
+
+    &:active {
+        background-color: color.adjust($bg, $lightness: 25%);
+        border: 4px solid color.adjust($text, $lightness: -50%);
+        color: color.adjust($text, $lightness: -50%);
+    }
+}
+
+@mixin button-small($text, $bg, $hover) {
+
+    background-color: $bg;
+    max-width: $max-btn-width;
+    font-family: 'Roboto';
+    padding: $btn-padding-small;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: 1.1px;
+    color: $text;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+        color: $hover;
+        background-color: color.adjust($bg, $lightness: 5%);
+        transition: all 0.3s ease;
+    }
+
+    &:active {
+        background-color: color.adjust($bg, $lightness: 5%);
+        border: 4px solid color.adjust($text, $lightness: -50%);
+        color: color.adjust($text, $lightness: -50%);
+    }
+}

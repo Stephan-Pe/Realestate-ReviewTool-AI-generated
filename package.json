@@ -1,0 +1,36 @@
+{
+  "name": "projectpage",
+  "main": "gulpfile.mjs",
+  "type": "module",
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/plugin-transform-runtime": "^7.19.6",
+    "@babel/preset-env": "^7.20.2",
+    "browser-sync": "^3.0.4",
+    "cross-env": "^10.1.0",
+    "del": "^8.0.1",
+    "gulp": "^5.0.1",
+    "gulp-babel": "^8.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-if": "^3.0.0",
+    "gulp-imagemin": "^9.2.0",
+    "gulp-rev": "^12.0.0",
+    "gulp-rev-delete-original": "^0.2.3",
+    "gulp-sass": "^6.0.1",
+    "gulp-sourcemaps": "^3.0.0",
+    "sass": "^1.83.0",
+    "webpack": "^5.104.1",
+    "webpack-stream": "^7.0.0"
+  },
+  "overrides": {
+    "got": "14.2.0",
+    "cross-spawn": "7.0.6",
+    "semver-regex": "4.0.5",
+    "postcss": "8.4.49",
+    "uuid": "9.0.1"
+  },
+  "scripts": {
+    "dev": "echo APP_ENV=dev > .env && cross-env NODE_ENV=dev gulp serve",
+    "prod": "echo APP_ENV=prod > .env && cross-env NODE_ENV=prod gulp"
+  }
+}
