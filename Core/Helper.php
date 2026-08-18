@@ -8,7 +8,7 @@ use Exception;
  * 
  * Helper functions for repetitive tasks
  * 
- *  PHP version 8.0.22
+ *  PHP version 8.2.12
  */
 
 class Helper extends \Core\Model
@@ -169,5 +169,27 @@ class Helper extends \Core\Model
       }
    }
 
+      /**
+     * Helper: Decode JSON input body, fallback to $_POST
+     * Checks $_SERVER['JSON_INPUT'] first (set by CsrfMiddleware)
+     *
+     * @return array
+     */
+    public static function getJsonInput(): array
+    {
+        // Check if CsrfMiddleware already decoded the input
+        if (isset($_SERVER['JSON_INPUT']) && is_array($_SERVER['JSON_INPUT'])) {
+            return $_SERVER['JSON_INPUT'];
+        }
 
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        if (strpos($contentType, 'application/json') !== false) {
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
+            if (is_array($data)) {
+                return $data;
+            }
+        }
+        return $_POST ?: [];
+    } 
 }

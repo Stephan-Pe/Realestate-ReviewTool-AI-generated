@@ -3,7 +3,7 @@
 /**
  * Front Controller
  * 
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 // echo 'REQUESTED URL = "' . $_SERVER['QUERY_STRING'] . '"';
 
@@ -113,6 +113,10 @@ $router->add('homes/deleteValuation/{id:\d+}', ['controller' => 'Homes', 'action
 $router->add('homes/list', ['controller' => 'Homes', 'action' => 'list']);
 $router->add('homes/captcha', ['controller' => 'Homes', 'action' => 'captcha']);
 
+// --- Cookie Consent routes ---
+$router->add('cookies/consent', ['controller' => 'Cookies', 'action' => 'consent']);
+$router->add('cookies/reject', ['controller' => 'Cookies', 'action' => 'reject']);
+
 // --- Original routes ---
 $router->add('about', ['controller' => 'About', 'action' => 'index']);
 
@@ -179,6 +183,8 @@ $allowedRoutes = [
         'homes/save',
         'homes/captcha',
         'signup/captcha',
+        'cookies/consent',
+        'cookies/reject',
     ],
     // DELETE routes
     'DELETE' => [],  // handled by catch-all {controller}/{id}/{action}

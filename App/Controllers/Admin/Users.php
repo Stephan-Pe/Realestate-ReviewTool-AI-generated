@@ -12,7 +12,7 @@ use \App\Flash;
 /**
  * User admin controller
  *
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 class Users extends \Core\Controller
 {

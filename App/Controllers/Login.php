@@ -17,7 +17,7 @@ use \App\Config;
  * Login Controller
  * 
  * 
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 class Login extends \Core\Controller
 {
@@ -155,7 +155,7 @@ class Login extends \Core\Controller
 
 
             unset($_SESSION['2fa_user_id']);
-            Auth::login($user, $remember_me ?? false);
+            Auth::login($user, $remember_me);
 
             $this->redirect(Auth::getReturnToPage());
         } else {

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  * Handles both the original sales/gallery features
  * and the new Real Estate Review (Bewertung) features.
  *
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 class Homes extends \Core\Controller
 {
@@ -258,10 +258,9 @@ class Homes extends \Core\Controller
      */
     public function searchAction(): void
     {
-        error_log('***** searchAction() WAS REACHED *****');
         header('Content-Type: application/json; charset=utf-8');
 
-        $input = $this->getJsonInput();
+        $input = Helper::getJsonInput();
         $query = $input['query'] ?? '';
 
         if ($query === '') {
@@ -282,13 +281,14 @@ class Homes extends \Core\Controller
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        $input = $this->getJsonInput();
+        $input = Helper::getJsonInput();
 
-        $plz           = $input['plz'] ?? '';
-        $propertyType  = $input['property_type'] ?? '';
-        $area          = $input['area'] ?? 0;
-        $condition     = $input['condition'] ?? '';
-        $equipment     = $input['equipment'] ?? '';
+        $plz               = $input['plz'] ?? '';
+        $propertyType      = $input['property_type'] ?? '';
+        $area              = $input['area'] ?? 0;
+        $condition         = $input['condition'] ?? '';
+        $equipment         = $input['equipment'] ?? '';
+        $residenceStatus   = $input['residence_status'] ?? 'erstwohnsitz';
 
         // Server-side validation
         if (empty($plz) || empty($propertyType) || empty($area) || empty($condition) || empty($equipment)) {
@@ -304,7 +304,7 @@ class Homes extends \Core\Controller
             exit;
         }
 
-        $result = Home::calculateValuation($plz, $propertyType, $area, $condition, $equipment);
+        $result = Home::calculateValuation($plz, $propertyType, $area, $condition, $equipment, $residenceStatus);
 
         echo json_encode(['success' => true, 'data' => $result]);
         exit;
@@ -318,7 +318,8 @@ class Homes extends \Core\Controller
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        $input = $this->getJsonInput();
+        $input = Helper::getJsonInput();
+      
 
         $valuation = new Home($input);
 
@@ -364,28 +365,6 @@ class Homes extends \Core\Controller
         exit;
     }
 
-    /**
-     * Helper: Decode JSON input body, fallback to $_POST
-     * Checks $_SERVER['JSON_INPUT'] first (set by CsrfMiddleware)
-     *
-     * @return array
-     */
-    private function getJsonInput(): array
-    {
-        // Check if CsrfMiddleware already decoded the input
-        if (isset($_SERVER['JSON_INPUT']) && is_array($_SERVER['JSON_INPUT'])) {
-            return $_SERVER['JSON_INPUT'];
-        }
-
-        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-        if (strpos($contentType, 'application/json') !== false) {
-            $json = file_get_contents('php://input');
-            $data = json_decode($json, true);
-            if (is_array($data)) {
-                return $data;
-            }
-        }
-        return $_POST ?: [];
-    }
+ 
 
 }

@@ -5,7 +5,7 @@ namespace Core;
 /**
  * Router
  * 
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 
 class Router

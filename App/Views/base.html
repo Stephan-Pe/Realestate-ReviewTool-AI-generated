@@ -24,6 +24,9 @@
 </head>
 
 <body>
+    {% if show_banner %}
+        {% include ('snippets/cookie.html') %}
+    {% endif %}
     <header class="header">
         <nav class="nav" user_role="navigation">
             <div class="nav__offscreen">
@@ -107,39 +110,7 @@
 
     {%endif%}
     <!-- admin-panel end -->
-    <div class="debug-panel" style="border: 2px solid #333; padding: 20px; background: #f9f9f9;">
-        <h2>Role Debugger</h2>
-        <p><strong>Current User:</strong> {{ current_user.user_name }}</p>
-        <p><strong>Assigned Role:</strong> {{ current_user.user_role }}</p>
-        <hr>
 
-        <h3>1. Positive Checks (What you CAN see)</h3>
-        <ul>
-            {% if hasRole('super') %} <li>✅ You have <strong>SUPER</strong> powers.</li> {% endif %}
-            {% if hasRole('admin') %} <li>✅ You have <strong>ADMIN</strong> powers.</li> {% endif %}
-            {% if hasRole('manager') %} <li>✅ You have <strong>MANAGER</strong> powers.</li> {% endif %}
-            {% if hasRole('user') %} <li>✅ You have <strong>USER</strong> powers.</li> {% endif %}
-        </ul>
-
-        <h3>2. Negative Checks (What you ARE NOT)</h3>
-        <ul style="color: #d9534f;">
-            {% if not hasRole('super') %}
-            <li>🚫 You are <strong>NOT</strong> a Super.</li>
-            {% endif %}
-
-            {% if not hasRole('admin') %}
-            <li>🚫 You are <strong>NOT</strong> an Admin.</li>
-            {% endif %}
-
-            {% if not hasRole('manager') %}
-            <li>🚫 You are <strong>NOT</strong> a Manager.</li>
-            {% endif %}
-
-            {% if not hasRole('user') %}
-            <li>🚫 You are <strong>NOT</strong> even a basic User (Guest).</li>
-            {% endif %}
-        </ul>
-    </div>
 
     <div class="container">
 
@@ -204,7 +175,10 @@
     <!-- build:js -->
     <script type="module" src="{{ asset('js/main.min.js') }}"></script>
     <!-- endbuild -->
-
+   <script type="module" defer>
+       import { initCookieConsent } from '/js/modules/cookieConsent.js';
+       document.addEventListener('DOMContentLoaded', initCookieConsent);
+   </script>
 
 
     {% block footer %} {% endblock %}

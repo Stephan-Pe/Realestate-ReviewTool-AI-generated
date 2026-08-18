@@ -172,8 +172,23 @@
                         </select>
                     </div>
 
+                    <!-- Residence Status -->
+                    <div class="review-form__field">
+                        <label for="residence_status" class="review-form__label">
+                            <i class="fas fa-key"></i> Wohnsitzart
+                        </label>
+                        <select id="residence_status" name="residence_status" class="review-form__select">
+                            <option value="erstwohnsitz">Erstwohnsitz</option>
+                            <option value="feriendomizil">Feriendomizil</option>
+                        </select>
+                    </div>
+
                     <!-- Submit -->
                     <div class="review-form__field review-form__field--submit">
+                        <div class="review-form__explanation">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Erstwohnsitz: nach 2012 gebaut, gesetzlich nur als Erstwohnsitz nutzbar. Feriendomizil: Wohnsitz ohne Auflagen, kann als Zweitwohnsitz genutzt werden. Erkundigen Sie sich bei Ihrem lokalen Bau- oder Grundbuchamt.</span>
+                        </div>
                         <button type="submit" class="review-btn review-btn--primary" id="calcBtn">
                             <i class="fas fa-calculator"></i> Bewertung durchführen
                         </button>
@@ -223,8 +238,12 @@
                         <span>Ausstattungsfaktor:</span>
                         <span id="resultEquipFactor"></span>
                     </div>
+                    <div class="review-result__factor-row">
+                        <span>Wohnsitzfaktor:</span>
+                        <span id="resultResidenceFactor"></span>
+                    </div>
                 </div>
-
+                {{ csrf_field() }}
                 <div class="review-result__actions">
                     <button type="submit" class="review-btn review-btn--secondary" id="btnSave">
                         <i class="fas fa-save"></i> Bewertung speichern
@@ -242,11 +261,13 @@
                     <input type="hidden" name="area" id="save_area" />
                     <input type="hidden" name="condition" id="save_condition" />
                     <input type="hidden" name="equipment" id="save_equipment" />
+                    <input type="hidden" name="residence_status" id="save_residence_status" />
                     <input type="hidden" name="price_per_sqm" id="save_price_per_sqm" />
                     <input type="hidden" name="total_value" id="save_total_value" />
                     <input type="hidden" name="location_factor" id="save_location_factor" />
                     <input type="hidden" name="condition_factor" id="save_condition_factor" />
                     <input type="hidden" name="equipment_factor" id="save_equipment_factor" />
+                    <input type="hidden" name="residence_status_factor" id="save_residence_status_factor" />
                     <input type="hidden" name="country" id="save_country" value="CH" />
                 </form>
 
@@ -427,6 +448,27 @@
     margin-top: 0.25rem;
     color: var(--review-text-light);
     font-size: 0.85rem;
+}
+
+/* Explanation text */
+.review-form__explanation {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    background: var(--review-primary-light);
+    border-left: 3px solid var(--review-primary);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.85rem;
+    color: var(--review-text);
+    line-height: 1.4;
+}
+
+.review-form__explanation i {
+    color: var(--review-primary);
+    margin-top: 0.1rem;
+    flex-shrink: 0;
 }
 
 /* PLZ Suggestions */

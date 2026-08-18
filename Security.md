@@ -1,4 +1,4 @@
-# Security Recommendations — Reviewtool
+yes# Security Recommendations — Reviewtool
 
 > Stand: 2025-06-24 | Projekt: Immobilien-Reviewtool (Graubünden)
 

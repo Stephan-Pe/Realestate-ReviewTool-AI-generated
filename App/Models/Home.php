@@ -9,7 +9,7 @@ use Core\View;
  * Home Model
  * Handles valuation and location database operations.
  *
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 class Home extends \Core\Model
 {
@@ -19,6 +19,15 @@ class Home extends \Core\Model
     public ?string $location_name = null;
     public ?string $country = null;
     public ?string $property_type = null;
+    public ?string $residence_status = null;
+    public ?float $residence_status_factor = null;
+    public ?string $threshold = null;
+
+    /**
+     * Static cache for residence status factors
+     * @var array
+     */
+    private static array $residenceFactorCache = [];
     public ?float $area = null;
     public ?string $condition = null;
     public ?string $equipment = null;
@@ -117,13 +126,13 @@ class Home extends \Core\Model
 
         $sql = 'INSERT INTO valuations
                 (plz, location_name, country, property_type, area, condition,
-                 equipment, price_per_sqm, total_value,
-                 location_factor, condition_factor, equipment_factor,
+                 equipment, residence_status, price_per_sqm, total_value,
+                 location_factor, condition_factor, equipment_factor, residence_status_factor,
                  created_at, updated_at)
                 VALUES
                 (:plz, :location_name, :country, :property_type, :area, :condition,
-                 :equipment, :price_per_sqm, :total_value,
-                 :location_factor, :condition_factor, :equipment_factor,
+                 :equipment, :residence_status, :price_per_sqm, :total_value,
+                 :location_factor, :condition_factor, :equipment_factor, :residence_status_factor,
                  NOW(), NOW())';
 
         $db = static::getDB();
@@ -136,11 +145,13 @@ class Home extends \Core\Model
         $stmt->bindValue(':area', $this->area, PDO::PARAM_STR);
         $stmt->bindValue(':condition', $this->condition, PDO::PARAM_STR);
         $stmt->bindValue(':equipment', $this->equipment, PDO::PARAM_STR);
+        $stmt->bindValue(':residence_status', $this->residence_status ?? 'erstwohnsitz', PDO::PARAM_STR);
         $stmt->bindValue(':price_per_sqm', $this->price_per_sqm, PDO::PARAM_STR);
         $stmt->bindValue(':total_value', $this->total_value, PDO::PARAM_STR);
         $stmt->bindValue(':location_factor', $this->location_factor, PDO::PARAM_STR);
         $stmt->bindValue(':condition_factor', $this->condition_factor, PDO::PARAM_STR);
         $stmt->bindValue(':equipment_factor', $this->equipment_factor, PDO::PARAM_STR);
+        $stmt->bindValue(':residence_status_factor', $this->residence_status_factor ?? 1.0, PDO::PARAM_STR);
 
         $stmt->execute();
         return (int) $db->lastInsertId();
@@ -342,36 +353,41 @@ class Home extends \Core\Model
      * @param float  $area
      * @param string $condition
      * @param string $equipment
+     * @param string $residenceStatus
      * @return array
      */
-    public static function calculateValuation(string $plz, string $propertyType, float $area, string $condition, string $equipment): array
+    public static function calculateValuation(string $plz, string $propertyType, float $area, string $condition, string $equipment, string $residenceStatus = 'erstwohnsitz'): array
     {
         $location = static::getLocationByPLZ($plz);
 
-        $basePrice        = static::getBasePrice($propertyType);
-        $locationFactor   = is_array($location) && isset($location['factor']) ? (float) $location['factor'] : 1.00;
-        $conditionFactor  = static::getConditionFactor($condition);
-        $equipmentFactor  = static::getEquipmentFactor($equipment);
+        $basePrice          = static::getBasePrice($propertyType);
+        $locationFactor     = is_array($location) && isset($location['factor']) ? (float) $location['factor'] : 1.00;
+        $trendFactor        = is_array($location) && isset($location['trend_factor']) ? (float) $location['trend_factor'] : 1.00;
+        $conditionFactor    = static::getConditionFactor($condition);
+        $equipmentFactor    = static::getEquipmentFactor($equipment);
+        $residenceFactor    = static::getResidenceStatusFactor($residenceStatus, $trendFactor);
 
-        $pricePerSqm = $basePrice * $locationFactor * $conditionFactor * $equipmentFactor;
+        $pricePerSqm = $basePrice * $locationFactor * $conditionFactor * $equipmentFactor * $residenceFactor;
         $totalValue  = $pricePerSqm * $area;
 
         $locationName = is_array($location) ? ($location['city'] ?? 'Unbekannt') : 'Unbekannt';
         $country      = is_array($location) ? ($location['country'] ?? 'CH') : 'CH';
 
         return [
-            'plz'                => $plz,
-            'location_name'      => $locationName,
-            'country'            => $country,
-            'property_type'      => $propertyType,
-            'area'               => $area,
-            'condition'          => $condition,
-            'equipment'          => $equipment,
-            'price_per_sqm'      => round($pricePerSqm, 2),
-            'total_value'        => round($totalValue, 2),
-            'location_factor'    => $locationFactor,
-            'condition_factor'   => $conditionFactor,
-            'equipment_factor'   => $equipmentFactor,
+            'plz'                    => $plz,
+            'location_name'          => $locationName,
+            'country'                => $country,
+            'property_type'          => $propertyType,
+            'area'                   => $area,
+            'condition'              => $condition,
+            'equipment'              => $equipment,
+            'residence_status'       => $residenceStatus,
+            'price_per_sqm'          => round($pricePerSqm, 2),
+            'total_value'            => round($totalValue, 2),
+            'location_factor'        => $locationFactor,
+            'condition_factor'       => $conditionFactor,
+            'equipment_factor'       => $equipmentFactor,
+            'residence_status_factor'=> $residenceFactor,
         ];
     }
 
@@ -436,4 +452,52 @@ class Home extends \Core\Model
             'einfach',
         ];
     }
+
+    /**
+     * Get residence status factor based on type and location trend.
+     * Reads from residence_status_factors table.
+     *
+     * @param string $residenceStatus 'erstwohnsitz' or 'feriendomizil'
+     * @param float  $trendFactor     from location (1.0 = normal, 1.6 = high-trend)
+     * @return float
+     */
+private static function getResidenceStatusFactor(string $residenceStatus, float $trendFactor): float
+{
+    $status = strtolower($residenceStatus);
+
+    // Build cache key
+    $cacheKey = $status . '_' . $trendFactor;
+
+    // Check cache first
+    if (isset(static::$residenceFactorCache[$cacheKey])) {
+        return static::$residenceFactorCache[$cacheKey];
+    }
+
+    $db = static::getDB();
+
+    if ($status === 'erstwohnsitz') {
+        // Erstwohnsitz: always trend_threshold = 0.00
+        $sql = "SELECT `factor` FROM residence_status_factors 
+                WHERE `status` = 'erstwohnsitz' AND `trend_threshold` = 0.00 
+                LIMIT 1";
+        $stmt = $db->prepare($sql);
+    } else {
+        // Feriendomizil: choose based on trend_factor
+        $threshold = $trendFactor > 1.0 ? 1.01 : 1.00;
+        $sql = "SELECT `factor` FROM residence_status_factors 
+                WHERE `status` = 'feriendomizil' AND `trend_threshold` = ? 
+                LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(1, $threshold, PDO::PARAM_STR);
+    }
+
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_COLUMN);
+
+    $factor = $result !== false ? (float) $result : ($status === 'erstwohnsitz' ? 0.8 : 1.0);
+
+    // Cache the result
+    static::$residenceFactorCache[$cacheKey] = $factor;
+    return $factor;
+}
 }

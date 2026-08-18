@@ -9,30 +9,34 @@ use \App\Models\User;
  * Authentication
  * 
  * 
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 
 class Auth
 {
-    protected static $user; // Static cache for the current logged in user model
+    protected static mixed $user;// Static cache for the current logged in user model
     /**
-     * Login the user
-     * 
-     * @param User $user The user model
-     * 
+     * Log in a user by starting a session and optionally setting a remember-me cookie.
+     *
+     * @param User $user
+     * @param bool $rememberMe
      * @return void
      */
-    public static function login($user, $remember_me)
+    public static function login(User $user, bool $rememberMe = false): void
     {
         session_regenerate_id(true);
 
         $_SESSION['user_id'] = $user->id;
 
-        if ($remember_me) {
-            if ($user->rememberLogin()) {
-
-                setcookie('remember_me', $user->remember_token, $user->expiry_timestamp, '/');
-            }
+        if ($rememberMe && $user->rememberLogin()) {
+            setcookie('remember_me', (string) $user->remember_token, [
+                'expires'  => (int) $user->expiry_timestamp,
+                'path'     => '/',
+                'domain'   => '',
+                'secure'   => true,       // HTTPS only
+                'httponly' => true,       // Prevents XSS script access
+                'samesite' => 'Lax',      // Protects against CSRF
+            ]);
         }
     }
 

@@ -53,6 +53,7 @@ const resultRange = document.getElementById('resultRange');
 const resultLocFactor = document.getElementById('resultLocFactor');
 const resultCondFactor = document.getElementById('resultCondFactor');
 const resultEquipFactor = document.getElementById('resultEquipFactor');
+const resultResidenceFactor = document.getElementById('resultResidenceFactor');
 
 // Save form hidden fields
 const savePlz = document.getElementById('save_plz');
@@ -66,6 +67,8 @@ const saveTotalValue = document.getElementById('save_total_value');
 const saveLocationFactor = document.getElementById('save_location_factor');
 const saveConditionFactor = document.getElementById('save_condition_factor');
 const saveEquipmentFactor = document.getElementById('save_equipment_factor');
+const saveResidenceStatus = document.getElementById('save_residence_status');
+const saveResidenceFactor = document.getElementById('save_residence_status_factor');
 
 // ===================================================================
 //  State
@@ -187,20 +190,20 @@ async function fetchPlzSuggestions(query) {
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
       const text = await response.text();
-      console.error(
-        "PLZ search non-JSON response:",
-        contentType,
-        text.substring(0, 500),
-      );
+    //   console.error(
+    //     "PLZ search non-JSON response:",
+    //     contentType,
+    //     text.substring(0, 500),
+    //   );
       hideSuggestions();
       return;
     }
 
     const data = await response.json();
-    console.log("PLZ search result:", data);
+    //console.log("PLZ search result:", data);
     displaySuggestions(data);
   } catch (error) {
-    console.error("PLZ search error:", error);
+    // console.error("PLZ search error:", error);
     hideSuggestions();
   }
 }
@@ -217,6 +220,7 @@ function displaySuggestions(locations) {
 
     locations.forEach(loc => {
         const div = document.createElement('div');
+        
         div.className = 'plz-suggestion';
         div.innerHTML = `<strong>${loc.plz}</strong> — ${loc.name} (${loc.country})`;
         div.addEventListener('click', () => {
@@ -266,6 +270,7 @@ async function performCalculation() {
     const area = document.getElementById('area')?.value;
     const condition = document.getElementById('condition')?.value;
     const equipment = document.getElementById('equipment')?.value;
+    const residenceStatus = document.getElementById('residence_status')?.value || 'erstwohnsitz';
 
     if (!plz || !propertyType || !area || !condition || !equipment) {
         showFlash('Bitte füllen Sie alle Felder aus.', 'warning');
@@ -289,6 +294,7 @@ async function performCalculation() {
                 area: parseFloat(area),
                 condition: condition,
                 equipment: equipment,
+                residence_status: residenceStatus,
                 csrf_token: getCsrfToken(),
             }),
         });
@@ -340,6 +346,7 @@ function displayResult(data) {
     if (resultLocFactor) resultLocFactor.textContent = data.location_factor.toFixed(3).replace('.', ',');
     if (resultCondFactor) resultCondFactor.textContent = data.condition_factor.toFixed(3).replace('.', ',');
     if (resultEquipFactor) resultEquipFactor.textContent = data.equipment_factor.toFixed(3).replace('.', ',');
+    if (resultResidenceFactor) resultResidenceFactor.textContent = (data.residence_status_factor || 1.0).toFixed(3).replace('.', ',');
 
     // Show result
     valuationResult.style.display = 'block';
@@ -356,6 +363,8 @@ function displayResult(data) {
     if (saveLocationFactor) saveLocationFactor.value = data.location_factor;
     if (saveConditionFactor) saveConditionFactor.value = data.condition_factor;
     if (saveEquipmentFactor) saveEquipmentFactor.value = data.equipment_factor;
+    if (saveResidenceStatus) saveResidenceStatus.value = data.residence_status || 'erstwohnsitz';
+    if (saveResidenceFactor) saveResidenceFactor.value = data.residence_status_factor || 1.0;
 
     // Scroll to result
     valuationResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -381,7 +390,8 @@ async function saveValuation() {
 
     if (btnSave) btnSave.disabled = true;
     if (btnSave) btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Speichern…';
-
+  
+    console.log(currentCalcData, getCsrfToken());
     try {
         const response = await fetch('/homes/save', {
             method: 'POST',
@@ -389,12 +399,20 @@ async function saveValuation() {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
             },
-            body: JSON.stringify({ ...currentCalcData, csrf_token: getCsrfToken() }),
+            body: JSON.stringify({ ...currentCalcData,  csrf_token: getCsrfToken()}),
         });
 
-        const data = await response.json();
+        let data;
+        if (response.ok) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            console.error('Save error:', response.status, response.statusText, text?.slice(0, 500));
+            showFlash('Speichern fehlgeschlagen.', 'warning');
+            return;
+        }
 
-        if (!response.ok || !data.success) {
+        if (!data.success) {
             showFlash(data.error || 'Speichern fehlgeschlagen.', 'warning');
             return;
         }

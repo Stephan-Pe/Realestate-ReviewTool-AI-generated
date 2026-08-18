@@ -5,7 +5,7 @@
  *
  * *** Temporary script that should be deleted before putting live! ***
  *
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 
 /**

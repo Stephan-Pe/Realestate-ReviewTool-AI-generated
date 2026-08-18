@@ -78,6 +78,10 @@ $router->add('homes/search',         ['controller' => 'Homes', 'action' => 'sear
 $router->add('homes/calculate',      ['controller' => 'Homes', 'action' => 'calculate']);
 $router->add('homes/save',           ['controller' => 'Homes', 'action' => 'save']);
 
+// Cookie Consent
+$router->add('cookie/consent',       ['controller' => 'CookieConsent', 'action' => 'consent']);
+$router->add('cookie/reject',        ['controller' => 'CookieConsent', 'action' => 'reject']);
+
 // Valuation list
 $router->add('homes/list',           ['controller' => 'Homes', 'action' => 'list']);
 

@@ -6,7 +6,7 @@ namespace App;
  * Flash notification messages for one-time using the session
  * for storage between requests
  * 
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 class Flash
 {

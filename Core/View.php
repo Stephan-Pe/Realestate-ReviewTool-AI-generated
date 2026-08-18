@@ -11,7 +11,7 @@ use App\Auth;
 /**
  * View
  * 
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 
 class View
@@ -86,7 +86,10 @@ class View
             $twig->addFunction(new \Twig\TwigFunction('csrf_field', function () {
                 return \App\Services\CsrfService::csrf_field();
             }, ['is_safe' => ['html']]));
-
+            $cookieConsent = \App\Services\CookieConsent::getConsent();
+                    // Make these variables available to EVERY Twig template automatically
+            $twig->addGlobal('cookie_consent', $cookieConsent);
+            $twig->addGlobal('show_banner', !isset($_COOKIE['cookie_consent']));
             if ($dev) {
                 $twig->enableDebug();
             }

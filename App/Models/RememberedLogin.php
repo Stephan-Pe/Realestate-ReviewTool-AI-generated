@@ -8,7 +8,7 @@ use \App\Token;
 /**
  * Remembered login model
  * 
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 class RememberedLogin extends \Core\Model
 {

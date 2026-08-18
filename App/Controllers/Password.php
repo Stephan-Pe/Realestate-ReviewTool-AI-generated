@@ -8,7 +8,7 @@ use \App\Models\User;
 /**
  * Password controller
  * 
- * PHP version 8.0.22
+ * PHP version 8.2.12
  * 
  */
 class Password extends \Core\Controller

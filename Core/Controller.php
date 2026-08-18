@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManager;
 /**
  * Base controller
  *
- * PHP version 8.0.22
+ * PHP version 8.2.12
  */
 abstract class Controller
 {

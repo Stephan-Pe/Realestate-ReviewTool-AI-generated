@@ -280,7 +280,7 @@ Diese Anwendung kommuniziert über JSON-Payloads. Die PHP-MVC-Controller erfasse
     /**
      * Router
      * 
-     * PHP version 8.0.22
+     * PHP version 8.2.12
      */
 
     class Router
@@ -505,7 +505,7 @@ Diese Anwendung kommuniziert über JSON-Payloads. Die PHP-MVC-Controller erfasse
     /**
      * Base model
      *
-     * PHP version 8.0.22
+     * PHP version 8.2.12
      */
     abstract class Model
     {
@@ -561,7 +561,7 @@ Diese Anwendung kommuniziert über JSON-Payloads. Die PHP-MVC-Controller erfasse
     /**
      * Base controller
      *
-     * PHP version 8.0.22
+     * PHP version 8.2.12
      */
     abstract class Controller
     {
