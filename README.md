@@ -1,9 +1,9 @@
-# 🏠 Immobilien-Reviewtool
+# 🏠 Immobilien-Reviewtool-Playground
 
-Ein modernes webbasiertes Reviewtool für Wohnimmobilien in der Schweiz, Focus auf den Kanton Graubuenden. Schätzen Sie den Marktwert Ihrer Immobilie basierend auf Standort, Zustand und Ausstattung. 
+Ein webbasiertes Reviewtool zum nachvollziehen von Wohnimmobilien-Bewertungen in der Schweiz, Focus auf den Kanton Graubuenden. Schätzen Sie den Marktwert Ihrer Immobilie basierend auf Standort, Zustand und Ausstattung. 
 
 ![PHP](https://img.shields.io/badge/PHP-8.2+-blue)
-![SQLite](https://img.shields.io/badge/SQLite-3-green)
+![MySQL](https://img.shields.io/badge/mysql-%234479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ---
