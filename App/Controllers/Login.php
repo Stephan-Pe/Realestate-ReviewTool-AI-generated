@@ -43,28 +43,31 @@ class Login extends \Core\Controller
      */
     public function createAction()
     {
-        $user = User::authenticate($_POST['user_email'], $_POST['user_password']);
-
-        $is_robot = !empty($_POST['send_info']); // checkbox just for robots-scripts
-        $remember_me = isset($_POST['remember_me']);
-
-        if (!$user || $is_robot) {
-            Flash::addMessage('Login fehlgeschlagen. Bitte prüfen Sie Ihre Daten.', FLASH::WARNING);
-            $this->redirect('/login');
-            return;
-        }
-        if (isset($user->id)) {
-            $_SESSION['2fa_user_id'] = (int) $user->id;
-            $_SESSION['2fa_remember_me'] = (bool) $remember_me;
-        //$is_privileged = in_array($user->user_role, ['admin', 'super']);
-        }
-      
-
-        if ($user) {
-            // USER HAS 2FA: Send to verification code entry
-            $this->redirect('/login/twofa');
-        }
+        Flash::addMessage('Funktion nicht aktiviert', FLASH::SUCCESS);
+        $this->redirect('/login');
         return;
+        // $user = User::authenticate($_POST['user_email'], $_POST['user_password']);
+
+        // $is_robot = !empty($_POST['send_info']); // checkbox just for robots-scripts
+        // $remember_me = isset($_POST['remember_me']);
+
+        // if (!$user || $is_robot) {
+        //     Flash::addMessage('Login fehlgeschlagen. Bitte prüfen Sie Ihre Daten.', FLASH::WARNING);
+        //     $this->redirect('/login');
+        //     return;
+        // }
+        // if (isset($user->id)) {
+        //     $_SESSION['2fa_user_id'] = (int) $user->id;
+        //     $_SESSION['2fa_remember_me'] = (bool) $remember_me;
+        //     //$is_privileged = in_array($user->user_role, ['admin', 'super']);
+        // }
+
+
+        // if ($user) {
+        //     // USER HAS 2FA: Send to verification code entry
+        //     $this->redirect('/login/twofa');
+        // }
+        // return;
     }
     /**
      * Show the 2FA setup page with QR code

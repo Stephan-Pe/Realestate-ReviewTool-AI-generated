@@ -177,6 +177,8 @@ $allowedRoutes = [
     ],
     // POST routes
     'POST' => [
+        'login/create',
+        'signup/create',
         'homes/search',
         'homes/calculate',
         'home/calculate',
@@ -208,6 +210,12 @@ if (!in_array($rawUrl, $allowed)) {
     echo '404 — Not Found';
     exit;
 }
+// // Display the routing table
+// echo '<pre>';
+// var_dump($router->getRoutes());
+// echo htmlspecialchars(print_r($router->getRoutes(), true));
+// echo '</pre>';
+
 
 // URL is whitelisted → safe to dispatch
 $router->dispatch($rawUrl);

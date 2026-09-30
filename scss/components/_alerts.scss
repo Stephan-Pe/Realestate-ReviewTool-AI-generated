@@ -2,8 +2,11 @@
     transition: all 0.5s ease;
     font-size: 1.4rem;
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    top: 80px;
+    right: 50%;
+    transform: translateX(50%);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: none;
     padding: 15px 25px;
     border-radius: 8px;
     z-index: 9999;

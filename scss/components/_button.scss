@@ -44,13 +44,13 @@
 
     &__link {
         border-bottom: 2px solid $clr_dark;
-        color: $clr_dark;
-        color: $clr_dark;
+
+        color: $gold;
 
         &:hover,
         &:focus {
-            color: $gold;
-            border-bottom: 3px solid $gold;
+            color: $clr_light;
+            border-bottom: 3px solid $clr_light;
         }
     }
 

@@ -13,7 +13,7 @@
 // ===================================================================
 //  CSRF Token
 // ===================================================================
-
+import { showFlash } from './alert.js';
 /**
  * Get CSRF token from the hidden input in the form
  * @returns {string}
@@ -120,7 +120,7 @@ function initPlzAutocomplete() {
 
     plzInput.addEventListener('input', () => {
         const query = plzInput.value.trim();
-        console.log('PLZ input changed:', typeof query, query);
+        // console.log('PLZ input changed:', typeof query, query);
         // Clear debounce timer
         if (plzDebounceTimer) clearTimeout(plzDebounceTimer);
 
@@ -190,11 +190,11 @@ async function fetchPlzSuggestions(query) {
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
       const text = await response.text();
-    //   console.error(
-    //     "PLZ search non-JSON response:",
-    //     contentType,
-    //     text.substring(0, 500),
-    //   );
+      console.error(
+        "PLZ search non-JSON response:",
+        contentType,
+        text.substring(0, 500),
+      );
       hideSuggestions();
       return;
     }
@@ -203,7 +203,7 @@ async function fetchPlzSuggestions(query) {
     //console.log("PLZ search result:", data);
     displaySuggestions(data);
   } catch (error) {
-    // console.error("PLZ search error:", error);
+    console.error("PLZ search error:", error);
     hideSuggestions();
   }
 }
@@ -246,9 +246,14 @@ function hideSuggestions() {
 //  Calculation
 // ===================================================================
 
+/**
+ * Initialize the calculation form event listeners.
+ * Sets up form submission (AJAX), reset button, and save button.
+ */
 function initCalculation() {
     if (!valuationForm) return;
 
+    // When the form is submitted, prevent default and call AJAX calculation
     valuationForm.addEventListener('submit', (e) => {
         e.preventDefault();
         performCalculation();
@@ -263,8 +268,32 @@ function initCalculation() {
     }
 }
 
+/**
+ * Perform the valuation calculation via AJAX POST to /homes/calculate.
+ *
+ * FORMULA (executed on the server in Home.php::calculateValuation()):
+ *   price_per_m² = base_price × location_factor × condition_factor × equipment_factor × residence_factor
+ *   total_value    = price_per_m² × area
+ *
+ * Steps on the server:
+ *   1. getBasePrice(propertyType) → base reference price (e.g., 8188 for Einfamilienhaus)
+ *   2. getLocationByPLZ(plz) → fetch trend_factor from locations table
+ *   3. getConditionFactor(condition) → e.g., 'gepflegt' = 1.00
+ *   4. getEquipmentFactor(equipment) → e.g., 'standard' = 1.00
+ *   5. getResidenceStatusFactor(residenceStatus, trendFactor) → e.g., 'erstwohnsitz' = 0.80
+ *   6. price_per_m² = step1 × step2 × step3 × step4 × step5
+ *   7. total_value = price_per_m² × area
+ *
+ * Example with all factors at 1.00 (baseline):
+ *   price_per_m² = 8188 × 1.00 × 1.00 × 1.00 × 1.00 = 8188 CHF/m²
+ *   total_value = 8188 × 150m² = 1,228,200 CHF
+ *
+ * Example with all factors applied (Davos, Einfamilienhaus, gepflegt, standard, erstwohnsitz):
+ *   price_per_m² = 8188 × 1.60 × 1.00 × 1.00 × 0.80 = 10,480.64 CHF/m²
+ *   total_value = 10,480.64 × 150m² = 1,572,096 CHF
+ */
 async function performCalculation() {
-    // Validate form
+    // Gather form inputs
     const plz = plzInput?.value.trim();
     const propertyType = document.getElementById('property_type')?.value;
     const area = document.getElementById('area')?.value;
@@ -272,16 +301,18 @@ async function performCalculation() {
     const equipment = document.getElementById('equipment')?.value;
     const residenceStatus = document.getElementById('residence_status')?.value || 'erstwohnsitz';
 
+    // Validate that all required fields are filled
     if (!plz || !propertyType || !area || !condition || !equipment) {
         showFlash('Bitte füllen Sie alle Felder aus.', 'warning');
         return;
     }
 
-    // Show loader
+    // Show loading spinner, hide previous results
     if (calcLoader) calcLoader.style.display = 'flex';
     if (valuationResult) valuationResult.style.display = 'none';
 
     try {
+        // Send calculation request to server
         const response = await fetch('/homes/calculate', {
             method: 'POST',
             headers: {
@@ -306,6 +337,7 @@ async function performCalculation() {
             return;
         }
 
+        // Store result for potential save, then display
         currentCalcData = data.data;
         displayResult(currentCalcData);
 
@@ -317,41 +349,65 @@ async function performCalculation() {
     }
 }
 
+/**
+ * Display the calculation results in the UI.
+ *
+ * Reads the server response data and populates:
+ *   - Location name + PLZ
+ *   - Price per m² (CHF/m²)
+ *   - Total value (CHF)
+ *   - Value range (−10% to +10%)
+ *   - Individual factors (location, condition, equipment, residence)
+ *   - Hidden form fields for save operation
+ *
+ * FACTOR DISPLAY FORMATTING:
+ *   - Factors are displayed with 3 decimal places, comma as decimal separator
+ *   - Example: 1.600 → "1,600" (Swiss number format)
+ */
 function displayResult(data) {
     if (!valuationResult) return;
 
-    // Location
+    // ---- Display location ----
     if (resultLocation) {
         resultLocation.textContent = `${data.location_name} (${data.plz})`;
     }
 
-    // Price per sqm
+    // ---- Display price per m² ----
+    // This is the BASE PRICE adjusted by all factors
+    // Formula: price_per_m² = base_price × location_factor × condition_factor × equipment_factor × residence_factor
     if (resultPricePerSqm) {
         resultPricePerSqm.textContent = formatCurrency(data.price_per_sqm, 'CHF') + '/m²';
     }
 
-    // Total value
+    // ---- Display total value ----
+    // This is the final estimated market value
+    // Formula: total_value = price_per_m² × area
     if (resultTotalValue) {
         resultTotalValue.textContent = formatCurrency(data.total_value, 'CHF');
     }
 
-    // Range (−10% to +10%)
+    // ---- Display value range (±10% uncertainty band) ----
+    // Shows the estimated range: 90% to 110% of the calculated value
     if (resultRange) {
         const low = data.total_value * 0.9;
         const high = data.total_value * 1.1;
         resultRange.textContent = `${formatCurrency(low)} – ${formatCurrency(high)} CHF`;
     }
 
-    // Factors
+    // ---- Display individual factors ----
+    // Each factor is shown with 3 decimal places, comma as decimal separator (Swiss format)
+    // These show the multiplier values used in the calculation
     if (resultLocFactor) resultLocFactor.textContent = data.location_factor.toFixed(3).replace('.', ',');
     if (resultCondFactor) resultCondFactor.textContent = data.condition_factor.toFixed(3).replace('.', ',');
     if (resultEquipFactor) resultEquipFactor.textContent = data.equipment_factor.toFixed(3).replace('.', ',');
     if (resultResidenceFactor) resultResidenceFactor.textContent = (data.residence_status_factor || 1.0).toFixed(3).replace('.', ',');
 
-    // Show result
+    // Show result panel
     valuationResult.style.display = 'block';
+console.log('Calculation result displayed:', data);
 
-    // Populate save form hidden fields
+    // ---- Populate hidden form fields for save operation ----
+    // These fields carry the calculation data to the save endpoint
     if (savePlz) savePlz.value = data.plz;
     if (saveLocationName) saveLocationName.value = data.location_name;
     if (savePropertyType) savePropertyType.value = data.property_type;
@@ -705,38 +761,6 @@ function formatCurrency(value, currency = 'CHF') {
     }).format(value);
 }
 
-function showFlash(text, type = 'info') {
-    // Check if flash container exists, if not create one
-    let flashContainer = document.querySelector('.review-flash-container');
-    if (!flashContainer) {
-        flashContainer = document.createElement('div');
-        flashContainer.className = 'review-flash-container';
-        const main = document.querySelector('.review-main__wrapper');
-        if (main) {
-            main.insertBefore(flashContainer, main.firstChild);
-        }
-    }
-
-    const iconMap = {
-        success: 'fa-check-circle',
-        warning: 'fa-exclamation-circle',
-        error: 'fa-times-circle',
-        info: 'fa-info-circle',
-    };
-
-    const flash = document.createElement('div');
-    flash.className = `review-flash review-flash--${type}`;
-    flash.innerHTML = `<i class="fas ${iconMap[type] || iconMap.info}"></i> ${text}`;
-
-    flashContainer.appendChild(flash);
-
-    // Auto-remove after 4 seconds
-    setTimeout(() => {
-        flash.style.opacity = '0';
-        flash.style.transition = 'opacity 0.3s';
-        setTimeout(() => flash.remove(), 300);
-    }, 4000);
-}
 
 // ===================================================================
 //  Public API

@@ -7,7 +7,7 @@
                 <h2 class="cookie-title">Cookie-Einstellungen</h2>
                 <p class="cookie-description">
                     Wir verwenden Cookies, um Ihre Erfahrung auf unserer Website zu verbessern.
-                    Notwendige Cookies sind immer aktiv. Sie k&ouml;nnen selbst &auml;ndern, welche nicht-notwendigen Cookies Sie zulassen.
+                    Notwendige Cookies sind immer aktiv. Es werden keine Nutzungsdaten gespeichert.
                 </p>
 
                 <div class="cookie-options">
@@ -22,31 +22,10 @@
                         </label>
                     </div>
                     {{ csrf_field() }}
-                    <div class="cookie-option">
-                        <div class="cookie-option-info">
-                            <span class="cookie-option-title">Analyse-Cookies</span>
-                            <span class="cookie-option-desc">Helfen uns zu verstehen, wie Besucher mit der Website interagieren</span>
-                        </div>
-                        <label class="cookie-toggle">
-                            <input type="checkbox" id="cookieAnalytics" {% if analytics_cookies %}checked{% endif %}>
-                            <span class="cookie-toggle-slider"></span>
-                        </label>
-                    </div>
 
-                    <div class="cookie-option">
-                        <div class="cookie-option-info">
-                            <span class="cookie-option-title">Marketing-Cookies</span>
-                            <span class="cookie-option-desc">Werden verwendet, um Ihnen relevante Werbung zu zeigen</span>
-                        </div>
-                        <label class="cookie-toggle">
-                            <input type="checkbox" id="cookieMarketing" {% if marketing_cookies %}checked{% endif %}>
-                            <span class="cookie-toggle-slider"></span>
-                        </label>
-                    </div>
                 </div>
 
                 <div class="cookie-actions">
-                    <button class="cookie-btn cookie-btn-secondary" id="cookieRejectBtn">Nur Notwendige</button>
                     <button class="cookie-btn cookie-btn-primary" id="cookieAcceptBtn">Alle akzeptieren</button>
                 </div>
             </div>

@@ -29,6 +29,7 @@ class Cookies extends \Core\Controller
      */
     public function consentAction(): void
     {
+         header('Content-Type: application/json');
         // Use JSON_INPUT set by CsrfMiddleware (php://input can only be read once)
         $input = Helper::getJsonInput();
 
@@ -39,7 +40,6 @@ class Cookies extends \Core\Controller
         // Validate CSRF token
         if (!$this->validateCsrf($input)) {
             http_response_code(403);
-            header('Content-Type: application/json');
             echo json_encode([
                 'success' => false,
                 'error' => 'Ungültiger CSRF-Token'
@@ -59,7 +59,8 @@ class Cookies extends \Core\Controller
 
         echo json_encode([
             'success' => true,
-            'message' => 'Cookie preferences saved'
+            'message' => 'Cookie preferences saved',
+            'consent' => $cookieConsent
         ]);
     }
 

@@ -1,3 +1,4 @@
+```js
 
 /**
  * Extract CSRF token from the Twig template form element
@@ -20,7 +21,7 @@ export function hasConsent() {
  * Toggle visibility of the banner overlay
  */
 export function toggleOverlay(show) {
-  const overlay = document.getElementById("cookieOverlay");
+  const overlay = document.getElementById("cookie-banner");
   if (overlay) {
     overlay.style.display = show ? "flex" : "none";
     document.body.style.overflow = show ? "hidden" : "";
@@ -92,3 +93,4 @@ export function initCookieConsent() {
 }
 
 
+```

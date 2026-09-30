@@ -1,5 +1,6 @@
 @use "../abstracts/breakpoints" as *;
 @use "../abstracts/colors" as *;
+@use "sass:color";
 
 
 .nav {
@@ -71,18 +72,28 @@
         width: 90px;
     }
 
-    a {
-        color: white;
-        font-weight: 600;
-        font-size: 1.25rem;
-        text-decoration: none;
-
-        &:hover,
-        &:focus {
-            color: $gold;
-            text-decoration: underline;
+        a {
+            color: white;
+            font-weight: 600;
+            font-size: 1.25rem;
+            text-decoration: none;
+    
+            &:hover,
+            &:focus {
+                color: color.adjust($clr_light, $lightness: -10%);
+                text-decoration: underline;
+    
+                >svg {
+                    fill: color.adjust($clr_light, $lightness: -10%);
+                    stroke: color.adjust($clr_light, $lightness: -10%);
+    
+                    path,
+                    circle {
+                        stroke: color.adjust($clr_light, $lightness: -10%);
+                    }
+                }
+            }
         }
-    }
 
 }
 

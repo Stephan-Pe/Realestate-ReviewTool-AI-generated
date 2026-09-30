@@ -1,0 +1,103 @@
+/* ============================================
+   Activation Email - Inline HTML Styles
+   Covers: activation_email.html
+   
+   NOTE: Email clients have limited CSS support.
+   All styles are inlined directly in the HTML.
+   This file serves as documentation/reference.
+   ============================================ */
+
+/* 
+   INLINED HTML TEMPLATE FOR ACTIVATION EMAIL
+   ============================================
+   
+   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" 
+          style="background-color: #051622; font-family: Arial, sans-serif;">
+     <tr>
+       <td align="center" style="padding: 40px 20px;">
+         <table role="presentation" width="600" cellpadding="0" cellspacing="0" 
+                style="background-color: #ffffff; border-radius: 8px; 
+                       box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-width: 600px; width: 100%;">
+           <tr>
+             <td align="center" style="padding: 40px 30px;">
+               
+               <!-- Title -->
+               <h1 style="margin: 0 0 20px 0; font-size: 28px; color: #051622; 
+                          font-weight: 700; text-align: center;">
+                 Newsletter Aktivierung
+               </h1>
+               
+               <!-- Message -->
+               <p style="margin: 0; font-size: 16px; color: #5d5c61; 
+                         line-height: 1.6; text-align: center;">
+                 Danke für Ihr Vertrauen. Klicken Sie 
+                 <a href="{{ url }}" 
+                    style="color: #1BA098; text-decoration: underline; font-weight: 600;">
+                   hier
+                 </a> 
+                 um den Account zu aktivieren.
+               </p>
+               
+             </td>
+           </tr>
+         </table>
+       </td>
+     </tr>
+   </table>
+   
+   ============================================
+   COLOR REFERENCE:
+   - Background: #051622 (dark blue)
+   - Card: #ffffff (white)
+   - Title: #051622 (dark blue)
+   - Text: #5d5c61 (gray)
+   - Link: #1BA098 (teal)
+   - Link Hover: #178a82 (darker teal)
+   ============================================
+*/
+
+/* 
+   ALTERNATIVE: Full styled version for preview
+   (Not used in email clients, for development only)
+   ============================================ */
+
+.activation-email-wrapper {
+    background-color: #051622;
+    font-family: Arial, sans-serif;
+    padding: 40px 20px;
+
+    .activation-card {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        padding: 40px 30px;
+
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 28px;
+            color: #051622;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        p {
+            margin: 0;
+            font-size: 16px;
+            color: #5d5c61;
+            line-height: 1.6;
+            text-align: center;
+
+            a {
+                color: #1BA098;
+                text-decoration: underline;
+                font-weight: 600;
+
+                &:hover {
+                    color: #178a82;
+                }
+            }
+        }
+    }
+}

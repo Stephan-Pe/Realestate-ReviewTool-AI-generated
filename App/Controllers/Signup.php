@@ -59,42 +59,45 @@ class Signup extends \Core\Controller
      */
     public function createAction()
     {
-              // Captcha & Rate Limiting 
-        if (!$this->checkCaptcha()) {
-            $f = sys_get_temp_dir() . '/rl_' . md5($_SERVER['REMOTE_ADDR']);
-            $count = is_file($f) ? (int) file_get_contents($f) : 0;
+         Flash::addMessage('Funktion nicht aktiviert', FLASH::SUCCESS);
+        $this->redirect('/signup');
+        return;
+        //       // Captcha & Rate Limiting 
+        // if (!$this->checkCaptcha()) {
+        //     $f = sys_get_temp_dir() . '/rl_' . md5($_SERVER['REMOTE_ADDR']);
+        //     $count = is_file($f) ? (int) file_get_contents($f) : 0;
 
-            if ($count > 5 && filemtime($f) > time() - 60) {
-                $wait = 60 - (time() - filemtime($f));
-                Flash::addMessage("Zu viele Versuche — warten Sie {$wait} Sekunden", Flash::WARNING);
-                $this->redirect('/signup');
-                return;
-            }
+        //     if ($count > 5 && filemtime($f) > time() - 60) {
+        //         $wait = 60 - (time() - filemtime($f));
+        //         Flash::addMessage("Zu viele Versuche — warten Sie {$wait} Sekunden", Flash::WARNING);
+        //         $this->redirect('/signup');
+        //         return;
+        //     }
 
-            file_put_contents($f, $count + 1, LOCK_EX);
-            Flash::addMessage('Captcha inkorrekt 🔥', Flash::WARNING);
-            $this->redirect('/signup');
-            return;
-        }
+        //     file_put_contents($f, $count + 1, LOCK_EX);
+        //     Flash::addMessage('Captcha inkorrekt 🔥', Flash::WARNING);
+        //     $this->redirect('/signup');
+        //     return;
+        // }
 
-        // Success
-        $f = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'rl_' . md5($_SERVER['REMOTE_ADDR']);
-        if (is_file($f)) unlink($f);
-          // User Data
+        // // Success
+        // $f = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'rl_' . md5($_SERVER['REMOTE_ADDR']);
+        // if (is_file($f)) unlink($f);
+        //   // User Data
 
-        $user = new User($_POST);
+        // $user = new User($_POST);
      
 
-        if ($user->save()) {
+        // if ($user->save()) {
           
-            $user->sendActivationEmail();
-            $this->redirect('/signup/success');
-        } else {
-            $_SESSION['old_input'] = $_POST;
-            View::renderTemplate('Signup/new.html', [
-                'old' => $_SESSION['old_input'] ?? []
-            ]);
-        }
+        //     $user->sendActivationEmail();
+        //     $this->redirect('/signup/success');
+        // } else {
+        //     $_SESSION['old_input'] = $_POST;
+        //     View::renderTemplate('Signup/new.html', [
+        //         'old' => $_SESSION['old_input'] ?? []
+        //     ]);
+        // }
     }
 
     /* Check if the captcha value is correct
