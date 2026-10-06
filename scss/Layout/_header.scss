@@ -108,14 +108,16 @@
         background-color: rgba($clr_dark, .3);
         color: white;
         text-align: center;
-
+        
         &__offscreen {
             all: unset;
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: space-around;
-
+            a:has(svg){
+                margin: 0 3rem 0 auto;
+            }
             img {
                 margin-bottom: 0px;
             }

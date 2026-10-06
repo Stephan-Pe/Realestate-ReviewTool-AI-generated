@@ -450,6 +450,9 @@
                 display: flex;
                 align-items: center;
                 gap: 0.3rem;
+                i{
+                    color: $review-primary;
+                }
             }
         }
 
@@ -529,4 +532,13 @@
             gap: 0.5rem;
         }
     }
+}
+.fas.fa-edit{
+    color: $review-primary;
+}
+.fas.fa-trash-alt{
+    color: $review-danger;
+}
+.fas.fa-eye{
+    color: $review-accent;
 }

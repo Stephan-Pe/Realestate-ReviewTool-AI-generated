@@ -19,7 +19,8 @@ body%}
         <h1 class="form-wrapper__lead">SignUp</h1>
         <div class="form__group">
           <label for="inputName" class="form-label">Name</label>
-          <input name="user_name" class="form__input" id="inputName" pattern="[\p{L} ,.'-]+" minlength="2"
+          <input name="user_name" class="form__input" id="inputName" required minlength="2" maxlength="50"
+            pattern="[A-Za-zÀ-ÖØ-öø-ÿ' \-]+" title="Enter a valid name using letters, spaces, apostrophes, or hyphens."
             placeholder="Ihr Name" autofocus value="{{ old.user_name }}" required />
           <small data-errormsg=""></small>
         </div>
@@ -31,7 +32,7 @@ body%}
         <div class="form__group">
           <label for="inputEmail" class="form-label">Email Adresse</label>
           <input name="user_email" type="email" class="form__input" id="inputEmail"
-            pattern="[a-zA-Z0-9._&'*+-]+@+[a-zA-Z0-9 &-]+\.[a-z]{2,}" placeholder="Ihre Email Adresse"
+            placeholder="Ihre Email Adresse"
             value="{{old.user_email }}" required />
           <small data-errormsg=""></small>
         </div>

@@ -17,6 +17,7 @@
 
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
     <!-- Google reCAPTCHA CDN -->
     <!-- <script src="https://www.google.com/recaptcha/api.js" async defer>
     </script> -->
@@ -33,14 +34,6 @@
 
                 <a class="nav__item" href="/#home" onclick="smoothScroll('home', 500)" aria-label="Go to Home section"
                     title="Home" id="home">Home</a>
-                <a class="nav__item" href="#" onclick="smoothScroll('habitat', 500)"
-                    aria-label="Go to Habitat section" title="Habitat">Habitat</a>
-                <a class="nav__item" href="#" onclick="smoothScroll('location', 500)"
-                    aria-label="Go to Standort section" title="Standort">Standort</a>
-                <a class="nav__item" href="#" onclick="smoothScroll('contact', 500)"
-                    aria-label="Go to Kontakt section" title="Kontakt">Kontakt</a>
-                <a class="nav__item" href="#" onclick="smoothScroll('plaene', 500)"
-                    aria-label="Go to Refugium section" title="Refugium Meum">Refugium Meum</a>
                 {% if current_user %}
                 <a id="sign-out" class="nav__wrapper--link" href="/logout" aria-label="proceed logout"
                     title="Logout User">{% include ('snippets/sign-out-icon.html') %}</a>
