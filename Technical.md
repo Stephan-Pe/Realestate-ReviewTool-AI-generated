@@ -119,7 +119,7 @@ All routes are defined in `public/index.php`. The router uses a custom `Core\Rou
 
 | Pattern | Description |
 |---------|-------------|
-| `home` | Static route → `HomeController::indexAction()` |
+| `home` | Static route → `Homes::indexAction()` |
 | `{controller}/{action}` | Dynamic route — matches any controller/action pair |
 | `{controller}/{id:\d+}/{action}` | Dynamic route with numeric ID parameter |
 | `password/reset/{token:[\da-f]+}` | Dynamic route with regex-constrained token |

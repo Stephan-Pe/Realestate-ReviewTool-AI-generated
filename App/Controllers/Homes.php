@@ -14,6 +14,7 @@ use \Core\ContactMailService;
 use \App\Middleware\CaptchaMiddleware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 /**
  * Homes Controller
  * Handles both the original sales/gallery features
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class Homes extends \Core\Controller
 {
     protected const BASE_PATH = __DIR__ . '/../..';
-    public $user;
+    public mixed $user = null;
 
     /**
      * Before filter
@@ -283,15 +284,18 @@ class Homes extends \Core\Controller
 
         $input = Helper::getJsonInput();
 
-        $plz               = $input['plz'] ?? '';
-        $propertyType      = $input['property_type'] ?? '';
-        $area              = $input['area'] ?? 0;
-        $condition         = $input['condition'] ?? '';
-        $equipment         = $input['equipment'] ?? '';
+        $plz                = $input['plz'] ?? '';
+        $propertyType       = $input['property_type'] ?? '';
+        $area               = $input['area'] ?? 0;
+        $plotAreaM2         = $input['plot_area_m2'] ?? 0;
+        $property_condition = $input['property_condition'] ?? '';
+        $equipment          = $input['equipment'] ?? '';
+        $microLocation      = $input['micro_location'] ?? 'standard';
+        $developmentPotential = $input['development_potential'] ?? 'none';
         $residenceStatus   = $input['residence_status'] ?? 'erstwohnsitz';
 
         // Server-side validation
-        if (empty($plz) || empty($propertyType) || empty($area) || empty($condition) || empty($equipment)) {
+        if (empty($plz) || empty($propertyType) || empty($area) || empty($property_condition) || empty($equipment)) {
             http_response_code(400);
             echo json_encode(['error' => 'Ungültige PLZ oder fehlende Angaben']);
             exit;
@@ -304,7 +308,17 @@ class Homes extends \Core\Controller
             exit;
         }
 
-        $result = Home::calculateValuation($plz, $propertyType, $area, $condition, $equipment, $residenceStatus);
+        $result = Home::calculateValuation(
+            $plz,
+            $propertyType,
+            $area,
+            $plotAreaM2,
+            $property_condition,
+            $equipment,
+            $microLocation,
+            $developmentPotential,
+            $residenceStatus
+        );
 
         echo json_encode(['success' => true, 'data' => $result]);
         exit;
@@ -319,7 +333,7 @@ class Homes extends \Core\Controller
         header('Content-Type: application/json; charset=utf-8');
 
         $input = Helper::getJsonInput();
-      
+
 
         $valuation = new Home($input);
 
@@ -364,7 +378,4 @@ class Homes extends \Core\Controller
         ]);
         exit;
     }
-
- 
-
 }

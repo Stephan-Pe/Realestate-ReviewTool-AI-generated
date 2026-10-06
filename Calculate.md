@@ -198,3 +198,52 @@ resultResidenceFactor.textContent = (data.residence_status_factor || 1.0).toFixe
 | residence_factor | getResidenceStatusFactor() | 0.8/1.0 | Keines |
 
 **Der Standortfaktor ist immer 1.00 weil die Spalte `factor` in der `locations` Tabelle nicht existiert. Die korrekte Spalte heisst `trend_factor`.**
+
+Beim Vergleich der Quadratmeter- und Objektpreise für Wohneigentum (Einfamilienhäuser und Eigentumswohnungen) in der Schweiz lassen sich die relativen Preisunterschiede anhand der Typologie des Bundesamtes für Statistik (BFS) und den Marktdaten führender Immobilienanalysten (Wüest Partner, IAZI, Raiffeisen) wie folgt zusammenfassen:
+
+### Relative Preisunterschiede nach Gemeindetypologie
+
+*(Ländliche Gemeinden dienen hierbei als Basiswert = 100 %)*
+
+* **Ländliche Gemeinden (Basis = 100 %):**
+* **Preisniveau:** Das günstigste Segment für Wohneigentum.
+* **Prozentualer Abstand:** Referenzwert (0 % Aufpreis).
+
+
+* **Intermediäre Gemeinden (Agglomerationsgürtel & periurban):**
+* **Preisniveau:** Mittleres Preissegment mit hoher Nachfrage durch Familien.
+* **Prozentualer Abstand:** **+25 % bis +45 %** gegenüber ländlichen Gemeinden.
+
+
+* **Städtische Gemeinden (Zentren & Kernstädte):**
+* **Preisniveau:** Sehr hohes Preisniveau aufgrund von Landknappheit und hoher Dichte.
+* **Prozentualer Abstand:** **+60 % bis +110 %** gegenüber ländlichen Gemeinden (in Grosszentren wie Zürich oder Genf teils noch höher).
+
+
+* **Tourismusgemeinden (Hotspots & Bergdestinationen):**
+* **Preisniveau:** Stark durch Zweitwohnungsnachfrage und internationales Publikum getrieben.
+* **Prozentualer Abstand:** **+50 % bis +120 %** gegenüber ländlichen Gemeinden (Top-Destinationen wie St. Moritz, Zermatt oder Gstaad liegen oft auf oder über dem Niveau städtischer Grosszentren).
+
+
+
+---
+
+### Übersicht: Durchschnittliche Richtpreise & Abweichungen
+
+| Gemeindetyp | Relativer Preisabstand | Richtwert $/m^2$ (EWG)* |
+| --- | --- | --- |
+| **Ländliche Gemeinden** | **Basis (100 %)** | CHF 5'500 – CHF 7'500 |
+| **Intermediäre Gemeinden** | **+25 % bis +45 %** | CHF 7'500 – CHF 10'000 |
+| **Städtische Gemeinden** | **+60 % bis +110 %** | CHF 10'500 – CHF 15'000+ |
+| **Tourismusgemeinden** | **+50 % bis +120 %+** | CHF 9'500 – CHF 18'000+ |
+
+**Hinweis: Richtwerte für Eigentumswohnungen (EWG) im mittleren Segment.*
+
+---
+
+### Wesentliche Treiber der Preisunterschiede
+
+1. **Städtische Gemeinden:** Hohe Erwerbsdichte, beste ÖV-Anbindung, erstklassiges Infrastrukturangebot und streng begrenzte Baulandreserven treiben die Quadratmeterpreise massiv in die Höhe.
+2. **Tourismusgemeinden:** Hoher Druck durch Zweitwohnungsinitiative und Auslandsnachfrage. Das Angebot ist stark limitiert, was zu überdurchschnittlichen Spitzenpreisen führt.
+3. **Intermediäre Gemeinden:** Profitieren vom Ausweichdruck aus den Städten ("Pendlergürtel"). Sie bieten Kompromisse aus Erreichbarkeit und tragbaren Quadratmeterpreisen.
+4. **Ländliche Gemeinden:** Grössere Grundstücksflächen zum vergleichsweise niedrigsten Quadratmeterpreis, jedoch eingeschränktere Erschliessung und längere Pendelzeiten.

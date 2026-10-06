@@ -30,16 +30,27 @@ class Home extends \Core\Model
      */
     private static array $residenceFactorCache = [];
     public ?float $area = null;
-    public ?string $condition = null;
+    public ?float $plot_area_m2 = null;
+    public ?string $property_condition = null;
     public ?string $equipment = null;
+    public ?string $micro_location = null;
+    public ?string $development_potential = null;
     public ?float $price_per_sqm = null;
     public ?float $total_value = null;
     public ?float $location_factor = null;
+    public ?float $micro_location_factor = null;
     public ?float $condition_factor = null;
     public ?float $equipment_factor = null;
+    public ?float $development_potential_factor = null;
     public ?string $created_at = null;
     public ?string $updated_at = null;
-
+    public ?float $building_value = null;
+    public ?float $development_value = null;
+    public ?float $effective_location_factor = null;
+    public ?float $macro_location_factor = null;
+    public ?float $trend_factor = null;
+    public ?float $trend_factor_2019 = null;
+    public ?float $trend_factor_2020 = null;
     /**
      * Validation error messages
      * @var array
@@ -126,15 +137,17 @@ class Home extends \Core\Model
         }
 
         $sql = 'INSERT INTO valuations
-                (plz, location_name, country, property_type, area, condition,
-                 equipment, residence_status, price_per_sqm, total_value,
-                 location_factor, condition_factor, equipment_factor, residence_status_factor,
-                 created_at, updated_at)
+                (plz, location_name, country, property_type, area, plot_area_m2, property_condition,
+                 equipment, micro_location, development_potential, residence_status,
+                 price_per_sqm, total_value, location_factor, micro_location_factor,
+                 condition_factor, equipment_factor, residence_status_factor,
+                 development_potential_factor, created_at, updated_at)
                 VALUES
-                (:plz, :location_name, :country, :property_type, :area, :condition,
-                 :equipment, :residence_status, :price_per_sqm, :total_value,
-                 :location_factor, :condition_factor, :equipment_factor, :residence_status_factor,
-                 NOW(), NOW())';
+                (:plz, :location_name, :country, :property_type, :area, :plot_area_m2, :property_condition,
+                 :equipment, :micro_location, :development_potential, :residence_status,
+                 :price_per_sqm, :total_value, :location_factor, :micro_location_factor,
+                 :condition_factor, :equipment_factor, :residence_status_factor,
+                 :development_potential_factor, NOW(), NOW())';
 
         $db = static::getDB();
         $stmt = $db->prepare($sql);
@@ -144,15 +157,20 @@ class Home extends \Core\Model
         $stmt->bindValue(':country', $this->country, PDO::PARAM_STR);
         $stmt->bindValue(':property_type', $this->property_type, PDO::PARAM_STR);
         $stmt->bindValue(':area', $this->area, PDO::PARAM_STR);
-        $stmt->bindValue(':condition', $this->condition, PDO::PARAM_STR);
+        $stmt->bindValue(':plot_area_m2', $this->plot_area_m2, PDO::PARAM_STR);
+        $stmt->bindValue(':property_condition', $this->property_condition, PDO::PARAM_STR);
         $stmt->bindValue(':equipment', $this->equipment, PDO::PARAM_STR);
+        $stmt->bindValue(':micro_location', $this->micro_location, PDO::PARAM_STR);
+        $stmt->bindValue(':development_potential', $this->development_potential, PDO::PARAM_STR);
         $stmt->bindValue(':residence_status', $this->residence_status ?? 'erstwohnsitz', PDO::PARAM_STR);
         $stmt->bindValue(':price_per_sqm', $this->price_per_sqm, PDO::PARAM_STR);
         $stmt->bindValue(':total_value', $this->total_value, PDO::PARAM_STR);
         $stmt->bindValue(':location_factor', $this->location_factor, PDO::PARAM_STR);
+        $stmt->bindValue(':micro_location_factor', $this->micro_location_factor, PDO::PARAM_STR);
         $stmt->bindValue(':condition_factor', $this->condition_factor, PDO::PARAM_STR);
         $stmt->bindValue(':equipment_factor', $this->equipment_factor, PDO::PARAM_STR);
         $stmt->bindValue(':residence_status_factor', $this->residence_status_factor ?? 1.0, PDO::PARAM_STR);
+        $stmt->bindValue(':development_potential_factor', $this->development_potential_factor ?? 1.0, PDO::PARAM_STR);
 
         $stmt->execute();
         return (int) $db->lastInsertId();
@@ -176,13 +194,20 @@ class Home extends \Core\Model
                     country = :country,
                     property_type = :property_type,
                     area = :area,
-                    condition = :condition,
+                    plot_area_m2 = :plot_area_m2,
+                    property_condition = :property_condition,
                     equipment = :equipment,
+                    micro_location = :micro_location,
+                    development_potential = :development_potential,
+                    residence_status = :residence_status,
                     price_per_sqm = :price_per_sqm,
                     total_value = :total_value,
                     location_factor = :location_factor,
+                    micro_location_factor = :micro_location_factor,
                     condition_factor = :condition_factor,
                     equipment_factor = :equipment_factor,
+                    residence_status_factor = :residence_status_factor,
+                    development_potential_factor = :development_potential_factor,
                     updated_at = NOW()
                 WHERE id = :id';
 
@@ -195,13 +220,20 @@ class Home extends \Core\Model
         $stmt->bindValue(':country', $this->country, PDO::PARAM_STR);
         $stmt->bindValue(':property_type', $this->property_type, PDO::PARAM_STR);
         $stmt->bindValue(':area', $this->area, PDO::PARAM_STR);
-        $stmt->bindValue(':condition', $this->condition, PDO::PARAM_STR);
+        $stmt->bindValue(':plot_area_m2', $this->plot_area_m2, PDO::PARAM_STR);
+        $stmt->bindValue(':property_condition', $this->property_condition, PDO::PARAM_STR);
         $stmt->bindValue(':equipment', $this->equipment, PDO::PARAM_STR);
+        $stmt->bindValue(':micro_location', $this->micro_location, PDO::PARAM_STR);
+        $stmt->bindValue(':development_potential', $this->development_potential, PDO::PARAM_STR);
+        $stmt->bindValue(':residence_status', $this->residence_status ?? 'erstwohnsitz', PDO::PARAM_STR);
         $stmt->bindValue(':price_per_sqm', $this->price_per_sqm, PDO::PARAM_STR);
         $stmt->bindValue(':total_value', $this->total_value, PDO::PARAM_STR);
         $stmt->bindValue(':location_factor', $this->location_factor, PDO::PARAM_STR);
+        $stmt->bindValue(':micro_location_factor', $this->micro_location_factor, PDO::PARAM_STR);
         $stmt->bindValue(':condition_factor', $this->condition_factor, PDO::PARAM_STR);
         $stmt->bindValue(':equipment_factor', $this->equipment_factor, PDO::PARAM_STR);
+        $stmt->bindValue(':residence_status_factor', $this->residence_status_factor ?? 1.0, PDO::PARAM_STR);
+        $stmt->bindValue(':development_potential_factor', $this->development_potential_factor ?? 1.0, PDO::PARAM_STR);
 
         return $stmt->execute();
     }
@@ -235,7 +267,7 @@ class Home extends \Core\Model
         if (empty($this->area) || $this->area <= 0) {
             $this->errors[] = 'Wohnfläche muss grösser als 0 sein.';
         }
-        if (empty($this->condition)) {
+        if (empty($this->property_condition)) {
             $this->errors[] = 'Zustand ist erforderlich.';
         }
         if (empty($this->equipment)) {
@@ -326,10 +358,10 @@ class Home extends \Core\Model
      *
      * Formula contribution: price_per_m² = base_price × location_factor × condition_factor × equipment_factor × residence_factor
      *
-     * @param string $condition
+     * @param string $property_condition
      * @return float
      */
-    public static function getConditionFactor(string $condition): float
+    public static function getConditionFactor(string $property_condition): float
     {
         // Condition factors: each represents a percentage adjustment from the standard (1.00)
         // 'gepflegt' (well-maintained) is the baseline = 1.00 (no adjustment)
@@ -342,7 +374,7 @@ class Home extends \Core\Model
         ];
         // Normalize input to lowercase for case-insensitive matching
         // Default to 1.00 (standard) if condition is unknown
-        return $factors[strtolower($condition)] ?? 1.00;
+        return $factors[strtolower($property_condition)] ?? 1.00;
     }
 
     /**
@@ -400,56 +432,104 @@ class Home extends \Core\Model
      * @param string $plz
      * @param string $propertyType
      * @param float  $area
-     * @param string $condition
+     * @param string $property_condition
      * @param string $equipment
      * @param string $residenceStatus
      * @return array
      */
-    public static function calculateValuation(string $plz, string $propertyType, float $area, string $condition, string $equipment, string $residenceStatus = 'erstwohnsitz'): array
-    {
+    /**
+     * Calculate a full valuation using the THREE-LAYER MODEL (per Refactoring.md).
+     *
+     * OVERALL FORMULA (per Refactoring.md example):
+     *   effective_location_factor = macro_location_factor × micro_location_factor
+     *   price_per_m² = base_price × effective_location_factor × condition_factor
+     *                × equipment_factor × residence_status_factor × development_potential_factor
+     *   total_value = price_per_m² × area
+     *
+     * EXAMPLE (from Refactoring.md):
+     *   PLZ 7260 (Davos), Einfamilienhaus, 150m², 600m² plot
+     *   base_price = 8188.00
+     *   macro_location = 1.60
+     *   micro_location = 1.15 (bevorzugte Lage)
+     *   property_condition = 1.00 (gepflegt)
+     *   equipment = 1.00 (standard)
+     *   residence = 1.00 (erstwohnsitz)
+     *   development = 1.12 (grosses Grundstück mit Ausbaureserve)
+     *   effective_location = 1.60 × 1.15 = 1.84
+     *   price_per_m² = 8188 × 1.84 × 1.00 × 1.00 × 1.00 × 1.12 = 16,873.34 CHF/m²
+     *   total_value = 16,873.34 × 150 = 2,531,001.00 CHF
+     *
+     * @param string $plz
+     * @param string $propertyType
+     * @param float  $area
+     * @param float  $plotAreaM2
+     * @param string $property_condition
+     * @param string $equipment
+     * @param string $microLocation
+     * @param string $developmentPotential
+     * @param string $residenceStatus
+     * @return array
+     */
+    public static function calculateValuation(
+        string $plz,
+        string $propertyType,
+        float $area,
+        float $plotAreaM2,
+        string $property_condition,
+        string $equipment,
+        string $microLocation,
+        string $developmentPotential,
+        string $residenceStatus = 'erstwohnsitz'
+    ): array {
         // Step 0: Look up location data from the 'locations' table by PLZ
-        // This fetches: plz, city, state, trend_factor, country
         $location = static::getLocationByPLZ($plz);
 
-        // ---- STEP 1: Get base price per m² for the property type ----
-        // This is the reference price for a 'standard' property in a 'normal' location
+        // ---- LAYER 1: Enhanced Location Factors ----
+        // Get macro location factor (PLZ-level)
+        $macroLocationFactor = is_array($location) && isset($location['macro_location_factor'])
+            ? (float) $location['macro_location_factor']
+            : 1.00;
+
+        // Get micro location factor (quality of specific location within PLZ)
+        $microLocationFactor = static::getMicroLocationFactor($microLocation);
+
+        // Effective location factor = macro × micro
+        $effectiveLocationFactor = $macroLocationFactor * $microLocationFactor;
+
+        // Also fetch the trend_factor for residence status lookup
+        $trendFactor = $macroLocationFactor; // macro_location_factor serves as trend_factor
+
+        // ---- LAYER 2: Property Characteristics ----
+        // Get base price per m² for the property type
         $basePrice = static::getBasePrice($propertyType);
 
-        // ---- STEP 2: Get location factor from the database ----
-        // BUG: This reads from $location['factor'] but the database column is named 'trend_factor'
-        //      The 'locations' table has NO column named 'factor', only 'trend_factor'
-        //      Because isset($location['factor']) always returns false, this ALWAYS defaults to 1.00
-        //      FIX: Change $location['factor'] to $location['trend_factor']
-        $locationFactor = is_array($location) && isset($location['trend_factor']) ? (float) $location['trend_factor'] :
-            1.00;
+        // Get condition factor
+        $conditionFactor = static::getConditionFactor($property_condition);
 
-        // Also fetch the trend_factor (this works correctly since column name matches)
-        // trend_factor values: 1.0 (rural), 1.1 (intermediate), 1.6 (high-trend tourist), 1.9 (urban)
-        $trendFactor = is_array($location) && isset($location['trend_factor']) ? (float) $location['trend_factor'] : 1.00;
-
-        // ---- STEP 3: Get condition factor ----
-        // Multiplier based on building condition (neuwertig=1.20, renoviert=1.10, gepflegt=1.00, etc.)
-        $conditionFactor = static::getConditionFactor($condition);
-
-        // ---- STEP 4: Get equipment factor ----
-        // Multiplier based on equipment/amenities level (luxus=1.30, gehoben=1.15, standard=1.00, einfach=0.85)
+        // Get equipment factor
         $equipmentFactor = static::getEquipmentFactor($equipment);
 
-        // ---- STEP 5: Get residence status factor ----
-        // Depends on residence type (erstwohnsitz vs feriendomizil) and location trend
-        // Firstwohnsitz: always uses trend_threshold=0.00 → factor=0.80 (Swiss housing law restrictions)
-        // Feriendomizil: uses trend_threshold based on trend_factor → factor=1.00 or 1.40
+        // Get residence status factor
         $residenceFactor = static::getResidenceStatusFactor($residenceStatus, $trendFactor);
 
-        // ---- STEP 6: Calculate adjusted price per m² ----
-        // Formula: base_price × all_factors = adjusted price per square meter
-        // Example: 8188 × 1.60 × 1.00 × 1.00 × 0.80 = 10,480.64 CHF/m²
-        $pricePerSqm = $basePrice * $locationFactor * $conditionFactor * $equipmentFactor * $residenceFactor;
+        // Get development potential factor
+        $developmentFactor = static::getDevelopmentPotentialFactor($developmentPotential);
 
-        // ---- STEP 7: Calculate total property value ----
-        // Formula: price_per_m² × area = total market value
-        // Example: 10,480.64 × 150m² = 1,572,096.00 CHF
+        // Calculate price per m² (includes ALL factors per Refactoring.md)
+        $pricePerSqm = $basePrice
+            * $effectiveLocationFactor
+            * $conditionFactor
+            * $equipmentFactor
+            * $residenceFactor
+            * $developmentFactor;
+
+        // Calculate total property value
         $totalValue = $pricePerSqm * $area;
+
+        // Calculate building value (without development potential)
+        $buildingValuePerSqm = $basePrice * $effectiveLocationFactor * $conditionFactor * $equipmentFactor * $residenceFactor;
+        $buildingValue = $buildingValuePerSqm * $area;
+        $developmentValue = $totalValue - $buildingValue;
 
         // Extract location name and country from the database result
         $locationName = is_array($location) ? ($location['city'] ?? 'Unbekannt') : 'Unbekannt';
@@ -457,20 +537,28 @@ class Home extends \Core\Model
 
         // Return all calculation results
         return [
-            'plz'                    => $plz,
-            'location_name'          => $locationName,
-            'country'                => $country,
-            'property_type'          => $propertyType,
-            'area'                   => $area,
-            'condition'              => $condition,
-            'equipment'              => $equipment,
-            'residence_status'       => $residenceStatus,
-            'price_per_sqm'          => round($pricePerSqm, 2),
-            'total_value'            => round($totalValue, 2),
-            'location_factor'        => $locationFactor,
-            'condition_factor'       => $conditionFactor,
-            'equipment_factor'       => $equipmentFactor,
-            'residence_status_factor'=> $residenceFactor,
+            'plz'                          => $plz,
+            'location_name'                => $locationName,
+            'country'                      => $country,
+            'property_type'                => $propertyType,
+            'area'                         => $area,
+            'plot_area_m2'                 => $plotAreaM2,
+            'property_condition'           => $property_condition,
+            'equipment'                    => $equipment,
+            'micro_location'               => $microLocation,
+            'development_potential'        => $developmentPotential,
+            'residence_status'             => $residenceStatus,
+            'price_per_sqm'                => round($pricePerSqm, 2),
+            'total_value'                  => round($totalValue, 2),
+            'building_value'               => round($buildingValue, 2),
+            'development_value'            => round($developmentValue, 2),
+            'location_factor'              => $macroLocationFactor,
+            'micro_location_factor'        => $microLocationFactor,
+            'effective_location_factor'    => $effectiveLocationFactor,
+            'condition_factor'             => $conditionFactor,
+            'equipment_factor'             => $equipmentFactor,
+            'residence_status_factor'      => $residenceFactor,
+            'development_potential_factor' => $developmentFactor,
         ];
     }
 
@@ -545,23 +633,32 @@ class Home extends \Core\Model
      * buyer pool.
      *
      * RESIDENCE STATUS FACTOR VALUES (from residence_status_factors table):
-     *   erstwohnsitz, trend_threshold=0.00  → factor = 0.800  (20% discount for primary residence restrictions)
-     *   feriendomizil, trend_threshold=1.00 → factor = 1.000  (normal area: no adjustment)
-     *   feriendomizil, trend_threshold=1.01 → factor = 1.400  (tourist area: 40% premium for vacation homes)
+     *   erstwohnsitz, trend_threshold=0.00  → factor = 1.000  (Baseline)
+     *   zweitwohnsitz, trend_threshold=0.00 → factor = 1.180  (Standardgebiet +18%)
+     *   zweitwohnsitz, trend_threshold=1.01 → factor = 1.250  (Tourismusgebiet +25%)
+     *   zweitwohnsitz_privilegiert, trend_threshold=0.00 → factor = 1.200  (Altrecht +20%)
+     *   zweitwohnsitz_privilegiert, trend_threshold=1.01 → factor = 1.250  (Altrecht +25%)
+     *   feriendomizil, trend_threshold=0.00 → factor = 1.000  (normal area: no adjustment)
+     *   feriendomizil, trend_threshold=1.01 → factor = 1.150  (tourist area: +15%)
      *
      * FORMULA INTEGRATION:
      *   residence_factor is the LAST multiplier applied to the price per m².
      *   It adjusts the price based on whether the property can be used as:
-     *     - Erstwohnsitz (primary residence): market restricted → lower value (0.80)
-     *     - Feriendomizil (vacation home): depends on location trend → normal or premium (1.00 or 1.40)
+     *     - Erstwohnsitz (primary residence): baseline (1.00)
+     *     - Zweitwohnsitz (secondary residence): premium due to scarcity (1.18–1.25)
+     *     - Feriendomizil (vacation home): depends on location trend → normal or premium (1.00 or 1.15)
      *
      * LOGIC FLOW:
-     *   1. If Erstwohnsitz → always look up factor where trend_threshold = 0.00 → returns 0.80
-     *   2. If Feriendomizil → check location's trend_factor:
-     *      a. If trend_factor > 1.0 (high-trend area like Davos/St.Moritz) → use threshold 1.01 → returns 1.40
-     *      b. If trend_factor <= 1.0 (normal area) → use threshold 1.00 → returns 1.00
+     *   1. If Erstwohnsitz → always look up factor where trend_threshold = 0.00 → returns 1.00
+     *   2. If Zweitwohnsitz → check location's trend_factor:
+     *      a. If trend_factor > 1.0 (high-trend area like Davos/St.Moritz) → use threshold 1.01 → returns 1.25
+     *      b. If trend_factor <= 1.0 (normal area) → use threshold 0.00 → returns 1.18
+     *   3. If Zweitwohnsitz_privilegiert → same logic as above but with different baseline threshold
+     *   4. If Feriendomizil → check location's trend_factor:
+     *      a. If trend_factor > 1.0 → use threshold 1.01 → returns 1.15
+     *      b. If trend_factor <= 1.0 → use threshold 0.00 → returns 1.00
      *
-     * @param string $residenceStatus 'erstwohnsitz' or 'feriendomizil'
+     * @param string $residenceStatus 'erstwohnsitz', 'zweitwohnsitz', 'zweitwohnsitz_privilegiert', or 'feriendomizil'
      * @param float  $trendFactor     from location (1.0 = normal, 1.6 = high-trend)
      * @return float
      */
@@ -583,21 +680,37 @@ class Home extends \Core\Model
         if ($status === 'erstwohnsitz') {
             // ---- ERSTWOHNSITZ (Primary Residence) ----
             // Always uses trend_threshold = 0.00 regardless of location trend
-            // This returns factor = 0.800 (20% discount due to Swiss housing law restrictions)
-            // The restriction means the property can only be sold to someone making it their primary home
-            // which significantly limits the buyer pool and thus the market value
+            // This returns factor = 1.000 (baseline, no adjustment)
+            // Erstwohnsitz is the standard baseline for valuation
             $sql = "SELECT `factor` FROM residence_status_factors
                     WHERE `status` = 'erstwohnsitz' AND `trend_threshold` = 0.00
                     LIMIT 1";
             $stmt = $db->prepare($sql);
+        } elseif ($status === 'zweitwohnsitz' || $status === 'zweitwohnsitz_privilegiert') {
+            // ---- ZWEITWOHNSITZ (Secondary Residence) ----
+            // The factor depends on the location's trend_factor:
+            //   - If trend_factor > 1.0 (high-trend tourist area): use threshold 1.01 → factor = 1.25
+            //     This reflects the premium for secondary homes in desirable tourist destinations
+            //     under Lex Weber (Zweitwohnungsgesetz) which restricts new second homes
+            //   - If trend_factor <= 1.0 (normal area): use threshold 0.00 → factor = 1.18
+            //     Standard secondary home pricing, moderate premium
+            //   - For 'zweitwohnsitz_privilegiert' (Altrecht): uses threshold 0.00 for baseline
+            //     Privilegierte Zweitwohnungen have existing rights and command a premium
+            $threshold = $trendFactor > 1.0 ? 1.01 : 0.00;
+            $sql = "SELECT `factor` FROM residence_status_factors
+                    WHERE `status` = ? AND `trend_threshold` = ?
+                    LIMIT 1";
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(1, $status, PDO::PARAM_STR);
+            $stmt->bindValue(2, $threshold, PDO::PARAM_STR);
         } else {
             // ---- FERIENDOMIZIL (Vacation Home) ----
             // The factor depends on the location's trend_factor:
-            //   - If trend_factor > 1.0 (high-trend tourist area): use threshold 1.01 → factor = 1.40
-            //     This reflects the premium for vacation homes in desirable tourist destinations
-            //   - If trend_factor <= 1.0 (normal area): use threshold 1.00 → factor = 1.00
+            //   - If trend_factor > 1.0 (high-trend tourist area): use threshold 1.01 → factor = 1.15
+            //     Premium for vacation homes in desirable tourist destinations
+            //   - If trend_factor <= 1.0 (normal area): use threshold 0.00 → factor = 1.00
             //     Normal vacation home pricing, no premium
-            $threshold = $trendFactor > 1.0 ? 1.01 : 1.00;
+            $threshold = $trendFactor > 1.0 ? 1.01 : 0.00;
             $sql = "SELECT `factor` FROM residence_status_factors
                     WHERE `status` = 'feriendomizil' AND `trend_threshold` = ?
                     LIMIT 1";
@@ -609,10 +722,130 @@ class Home extends \Core\Model
         $result = $stmt->fetch(PDO::FETCH_COLUMN);
 
         // Use database value if found, otherwise fall back to hardcoded defaults
-        $factor = $result !== false ? (float) $result : ($status === 'erstwohnsitz' ? 0.8 : 1.0);
+        $factor = $result !== false ? (float) $result : ($status === 'erstwohnsitz' ? 1.0 : 1.0);
 
         // Cache the result for subsequent calls
         static::$residenceFactorCache[$cacheKey] = $factor;
         return $factor;
+    }
+
+    /**
+     * Get micro location factor (quality of specific location within PLZ)
+     *
+     * Micro location quality ranges from 'peripheral' to 'top'.
+     * This factor multiplies the macro location factor to refine the location premium.
+     *
+     * Values:
+     *   'top'       → 1.25 (prime location, e.g., lakefront, ski-in/ski-out)
+     *   'good'      → 1.10 (desirable area, good accessibility)
+     *   'standard'  → 1.00 (average location, baseline)
+     *   'peripheral'→ 0.85 (less desirable, remote, or noisy area)
+     *
+     * @param string $microLocation
+     * @return float
+     */
+    public static function getMicroLocationFactor(string $microLocation): float
+    {
+        $factors = [
+            'top'       => 1.25,
+            'good'      => 1.10,
+            'standard'  => 1.00,
+            'peripheral'=> 0.85,
+        ];
+
+        // Normalize input to lowercase for case-insensitive matching
+        // Default to 1.00 (standard) if micro location is unknown
+        return $factors[strtolower($microLocation)] ?? 1.00;
+    }
+
+    /**
+     * Get development potential factor (Ausnützungsreserve)
+     *
+     * Development potential represents the value of unused building rights
+     * (excess land that could be developed).
+     *
+     * Values per Refactoring.md:
+     *   'none'      → 1.00 (Ausnützung voll ausgeschöpft)
+     *   'minor'     → 1.10 (Moderate Reserve +10%, anbau-/aufstockbar)
+     *   'major'     → 1.20 (Grosse Ausnützungsreserve / Verdichtungspotenzial +20%)
+     *
+     * @param string $developmentPotential
+     * @return float
+     */
+    public static function getDevelopmentPotentialFactor(string $developmentPotential): float
+    {
+        $factors = [
+            'none'  => 1.00,
+            'minor' => 1.10,
+            'major' => 1.20,
+        ];
+
+        // Normalize input to lowercase for case-insensitive matching
+        // Default to 1.00 (none) if development potential is unknown
+        return $factors[strtolower($developmentPotential)] ?? 1.00;
+    }
+
+    /**
+     * Get all residence status options with their factors
+     *
+     * Returns an array of residence status options suitable for dropdown menus.
+     * Each option includes the status key, display label, and default factor.
+     *
+     * @return array
+     */
+    public static function getResidenceStatusOptions(): array
+    {
+        return [
+            ['value' => 'erstwohnsitz', 'label' => 'Erstwohnsitz', 'factor' => 1.00],
+            ['value' => 'zweitwohnsitz', 'label' => 'Zweitwohnsitz (Standard)', 'factor' => 1.18],
+            ['value' => 'zweitwohnsitz_privilegiert', 'label' => 'Zweitwohnsitz (Privilegiert / Altrecht)', 'factor' => 1.20],
+            ['value' => 'feriendomizil', 'label' => 'Feriendomizil', 'factor' => 1.00],
+        ];
+    }
+
+    /**
+     * Get all micro location options
+     *
+     * Returns an array of micro location options suitable for dropdown menus.
+     *
+     * @return array
+     */
+    public static function getMicroLocationOptions(): array
+    {
+        return [
+            ['value' => 'top', 'label' => 'Top-Lage (Panoramablick, Sonnig)', 'factor' => 1.25],
+            ['value' => 'good', 'label' => 'Gute Wohnlage (Ruhig, Gute Erschliessung)', 'factor' => 1.10],
+            ['value' => 'standard', 'label' => 'Standard (Durchschnitt)', 'factor' => 1.00],
+            ['value' => 'peripheral', 'label' => 'Peripherie (Schattig, Immissionsbelastet)', 'factor' => 0.85],
+        ];
+    }
+
+    /**
+     * Get all development potential options
+     *
+     * Returns an array of development potential options suitable for dropdown menus.
+     *
+     * @return array
+     */
+    public static function getDevelopmentPotentialOptions(): array
+    {
+        return [
+            ['value' => 'none', 'label' => 'Keine (Ausnützung voll ausgeschöpft)', 'factor' => 1.00],
+            ['value' => 'minor', 'label' => 'Gering (Moderate Reserve +10%)', 'factor' => 1.10],
+            ['value' => 'major', 'label' => 'Signifikant (Verdichtungspotenzial +20%)', 'factor' => 1.20],
+        ];
+    }
+
+    /**
+     * Get development potential factors from database
+     *
+     * @return array
+     */
+    public static function getDevelopmentPotentialFactors(): array
+    {
+        $db = static::getDB();
+        $sql = 'SELECT reserve_type, factor, description FROM development_potential_factors ORDER BY factor DESC';
+        $stmt = $db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

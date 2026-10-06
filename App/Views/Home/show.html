@@ -45,8 +45,16 @@
             <div class="review-result__factors">
                 <h3><i class="fas fa-sliders-h"></i> Faktoren</h3>
                 <div class="review-result__factor-row">
-                    <span>Standortfaktor:</span>
+                    <span>Macro-Lagefaktor (PLZ):</span>
                     <span>{{ valuation.location_factor|number_format(3, '.', ',') }}</span>
+                </div>
+                <div class="review-result__factor-row">
+                    <span>Mikrolage-Faktor:</span>
+                    <span>{{ valuation.micro_location_factor|number_format(3, '.', ',') }}</span>
+                </div>
+                <div class="review-result__factor-row">
+                    <span>Effektiver Standortfaktor:</span>
+                    <span>{{ (valuation.location_factor * valuation.micro_location_factor)|number_format(3, '.', ',') }}</span>
                 </div>
                 <div class="review-result__factor-row">
                     <span>Zustandsfaktor:</span>
@@ -56,6 +64,14 @@
                     <span>Ausstattungsfaktor:</span>
                     <span>{{ valuation.equipment_factor|number_format(3, '.', ',') }}</span>
                 </div>
+                <div class="review-result__factor-row">
+                    <span>Wohnsitzfaktor:</span>
+                    <span>{{ valuation.residence_status_factor|number_format(3, '.', ',') }}</span>
+                </div>
+                <div class="review-result__factor-row">
+                    <span>Ausnützungsreserve-Faktor:</span>
+                    <span>{{ valuation.development_potential_factor|number_format(3, '.', ',') }}</span>
+                </div>
             </div>
 
             <div class="review-result__detail">
@@ -63,7 +79,7 @@
                 <div class="review-result__detail-grid">
                     <div><strong>Objektart:</strong> {{ valuation.property_type }}</div>
                     <div><strong>Wohnfläche:</strong> {{ valuation.area }} m²</div>
-                    <div><strong>Zustand:</strong> {{ valuation.condition }}</div>
+                    <div><strong>Zustand:</strong> {{ valuation.property_condition }}</div>
                     <div><strong>Ausstattung:</strong> {{ valuation.equipment }}</div>
                     <div><strong>PLZ:</strong> {{ valuation.plz }} — {{ valuation.location_name }}</div>
                     <div><strong>Land:</strong> {{ valuation.country }}</div>

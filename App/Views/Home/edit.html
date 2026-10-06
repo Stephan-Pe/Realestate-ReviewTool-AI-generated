@@ -61,13 +61,13 @@
                     <label class="review-form__label">
                         <i class="fas fa-hard-hat"></i> Zustand
                     </label>
-                    <select id="condition" name="condition" class="review-form__select" required>
+                    <select id="property_condition" name="property_condition" class="review-form__select" required>
                         <option value="">Bitte wählen</option>
-                        <option value="neuwertig" {{ valuation.condition == 'neuwertig' ? 'selected' : '' }}>Neuwertig</option>
-                        <option value="renoviert" {{ valuation.condition == 'renoviert' ? 'selected' : '' }}>Renoviert</option>
-                        <option value="gepflegt" {{ valuation.condition == 'gepflegt' ? 'selected' : '' }}>Gepflegt</option>
-                        <option value="sanierungsbedürftig" {{ valuation.condition == 'sanierungsbedürftig' ? 'selected' : '' }}>Sanierungsbedürftig</option>
-                        <option value="renierungsbedürftig" {{ valuation.condition == 'renierungsbedürftig' ? 'selected' : '' }}>Renierungsbedürftig</option>
+                        <option value="neuwertig" {{ valuation.property_condition == 'neuwertig' ? 'selected' : '' }}>Neuwertig</option>
+                        <option value="renoviert" {{ valuation.property_condition == 'renoviert' ? 'selected' : '' }}>Renoviert</option>
+                        <option value="gepflegt" {{ valuation.property_condition == 'gepflegt' ? 'selected' : '' }}>Gepflegt</option>
+                        <option value="sanierungsbedürftig" {{ valuation.property_condition == 'sanierungsbedürftig' ? 'selected' : '' }}>Sanierungsbedürftig</option>
+                        <option value="renierungsbedürftig" {{ valuation.property_condition == 'renierungsbedürftig' ? 'selected' : '' }}>Renierungsbedürftig</option>
                     </select>
                 </div>
 
@@ -81,6 +81,52 @@
                         <option value="gehoben" {{ valuation.equipment == 'gehoben' ? 'selected' : '' }}>Gehoben</option>
                         <option value="standard" {{ valuation.equipment == 'standard' ? 'selected' : '' }}>Standard</option>
                         <option value="einfach" {{ valuation.equipment == 'einfach' ? 'selected' : '' }}>Einfach</option>
+                    </select>
+                </div>
+
+                <!-- Residence Status -->
+                <div class="review-form__field">
+                    <label class="review-form__label">
+                        <i class="fas fa-key"></i> Wohnsitzart
+                    </label>
+                    <select id="residence_status" name="residence_status" class="review-form__select">
+                        <option value="erstwohnsitz" {{ valuation.residence_status == 'erstwohnsitz' ? 'selected' : '' }}>Erstwohnsitz</option>
+                        <option value="zweitwohnsitz" {{ valuation.residence_status == 'zweitwohnsitz' ? 'selected' : '' }}>Zweitwohnsitz (Standard)</option>
+                        <option value="zweitwohnsitz_privilegiert" {{ valuation.residence_status == 'zweitwohnsitz_privilegiert' ? 'selected' : '' }}>Zweitwohnsitz (Privilegiert / Altrecht)</option>
+                        <option value="feriendomizil" {{ valuation.residence_status == 'feriendomizil' ? 'selected' : '' }}>Feriendomizil</option>
+                    </select>
+                </div>
+
+                <!-- Plot Area -->
+                <div class="review-form__field">
+                    <label class="review-form__label">
+                        <i class="fas fa-vector-square"></i> Grundstücksfläche (m²)
+                    </label>
+                    <input type="number" id="plot_area_m2" name="plot_area_m2" class="review-form__input" value="{{ valuation.plot_area_m2 ?? '' }}" min="0" step="1" placeholder="z.B. 500" />
+                </div>
+
+                <!-- Micro Location -->
+                <div class="review-form__field">
+                    <label class="review-form__label">
+                        <i class="fas fa-map-marked-alt"></i> Mikrolage
+                    </label>
+                    <select id="micro_location" name="micro_location" class="review-form__select">
+                        <option value="standard" {{ valuation.micro_location == 'standard' ? 'selected' : '' }}>Standard</option>
+                        <option value="good" {{ valuation.micro_location == 'good' ? 'selected' : '' }}>Gut</option>
+                        <option value="top" {{ valuation.micro_location == 'top' ? 'selected' : '' }}>Top</option>
+                        <option value="peripheral" {{ valuation.micro_location == 'peripheral' ? 'selected' : '' }}>Peripher</option>
+                    </select>
+                </div>
+
+                <!-- Development Potential -->
+                <div class="review-form__field">
+                    <label class="review-form__label">
+                        <i class="fas fa-expand-arrows-alt"></i> Ausnützungsreserve
+                    </label>
+                    <select id="development_potential" name="development_potential" class="review-form__select">
+                        <option value="none" {{ valuation.development_potential == 'none' ? 'selected' : '' }}>Keine</option>
+                        <option value="minor" {{ valuation.development_potential == 'minor' ? 'selected' : '' }}>Gering</option>
+                        <option value="major" {{ valuation.development_potential == 'major' ? 'selected' : '' }}>Signifikant</option>
                     </select>
                 </div>
 

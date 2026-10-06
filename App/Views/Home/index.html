@@ -24,17 +24,17 @@
             <div class="review-result__grid">
                 <div class="review-result__card">
                     <span class="review-result__card-label">Preis pro m²</span>
-                    <span class="review-result__card-value">{{ _calc_result.price_per_sqm|number_format(2, '.', ' ') }} CHF/m²</span>
+                    <span class="review-result__card-value">{{ _calc_result.price_per_sqm|number_format(2, '.', ' ') }}&nbsp;CHF/m²</span>
                 </div>
                 <div class="review-result__card review-result__card--highlight">
                     <span class="review-result__card-label">Geschätzter Marktwert</span>
-                    <span class="review-result__card-value">{{ _calc_result.total_value|number_format(2, '.', ' ') }} CHF</span>
+                    <span class="review-result__card-value">{{ _calc_result.total_value|number_format(2, '.', "'") }}&nbsp;CHF</span>
                 </div>
                 <div class="review-result__card">
                     <span class="review-result__card-label">Bewertungsspanne</span>
                     <span class="review-result__card-value">
-                        {{ ((_calc_result.total_value * 0.9)|number_format(0, '.', ' ')) }} –
-                        {{ ((_calc_result.total_value * 1.1)|number_format(0, '.', ' ')) }} CHF
+                        {{ ((_calc_result.total_value * 0.9)|number_format(0, '.', ' ')) }}&nbsp;-&nbsp;
+                        {{ ((_calc_result.total_value * 1.1)|number_format(0, '.', ' ')) }}&nbsp;CHF
                     </span>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                 </div>
                 <div class="review-result__factor-row">
                     <span>Zustandsfaktor:</span>
-                    <span>{{ _calc_result.condition_factor|number_format(3, '.', ',') }}</span>
+                    <span>{{ _calc_result.property_condition_factor|number_format(3, '.', ',') }}</span>
                 </div>
                 <div class="review-result__factor-row">
                     <span>Ausstattungsfaktor:</span>
@@ -143,12 +143,12 @@
                         />
                     </div>
 
-                    <!-- Condition -->
+                    <!-- property_condition -->
                     <div class="review-form__field">
-                        <label for="condition" class="review-form__label">
+                        <label for="property_condition" class="review-form__label">
                             <i class="fas fa-hard-hat"></i> Zustand
                         </label>
-                        <select id="condition" name="condition" class="review-form__select" required>
+                        <select id="property_condition" name="property_condition" class="review-form__select" required>
                             <option value="">Bitte wählen</option>
                             <option value="neuwertig">Neuwertig</option>
                             <option value="renoviert">Renoviert</option>
@@ -178,8 +178,51 @@
                             <i class="fas fa-key"></i> Wohnsitzart
                         </label>
                         <select id="residence_status" name="residence_status" class="review-form__select">
-                            <option value="erstwohnsitz">Erstwohnsitz</option>
-                            <option value="feriendomizil">Feriendomizil</option>
+                            <option value="erstwohnsitz">Erstwohnsitz (Baseline 1.00)</option>
+                            <option value="zweitwohnsitz">Zweitwohnsitz (Standard, +18-25%)</option>
+                            <option value="zweitwohnsitz_privilegiert">Zweitwohnsitz (Privilegiert / Altrecht, +20-25%)</option>
+                            <option value="feriendomizil">Feriendomizil (Normalgebiet)</option>
+                        </select>
+                    </div>
+
+                    <!-- Plot Area -->
+                    <div class="review-form__field">
+                        <label for="plot_area_m2" class="review-form__label">
+                            <i class="fas fa-vector-square"></i> Grundstücksfläche (m²)
+                        </label>
+                        <input
+                            type="number"
+                            id="plot_area_m2"
+                            name="plot_area_m2"
+                            class="review-form__input"
+                            placeholder="z.B. 500"
+                            min="0"
+                            step="1"
+                        />
+                    </div>
+
+                    <!-- Micro Location -->
+                    <div class="review-form__field">
+                        <label for="micro_location" class="review-form__label">
+                            <i class="fas fa-map-marked-alt"></i> Mikrolage
+                        </label>
+                        <select id="micro_location" name="micro_location" class="review-form__select">
+                            <option value="standard">Standard</option>
+                            <option value="good">Gut</option>
+                            <option value="top">Top</option>
+                            <option value="peripheral">Peripher</option>
+                        </select>
+                    </div>
+
+                    <!-- Development Potential -->
+                    <div class="review-form__field">
+                        <label for="development_potential" class="review-form__label">
+                            <i class="fas fa-expand-arrows-alt"></i> Ausnützungsreserve
+                        </label>
+                        <select id="development_potential" name="development_potential" class="review-form__select">
+                            <option value="none">Keine</option>
+                            <option value="minor">Gering</option>
+                            <option value="major">Signifikant</option>
                         </select>
                     </div>
 
@@ -231,6 +274,10 @@
                         <span id="resultLocFactor"></span>
                     </div>
                     <div class="review-result__factor-row">
+                        <span>Mikrolage-Faktor:</span>
+                        <span id="resultMicroFactor"></span>
+                    </div>
+                    <div class="review-result__factor-row">
                         <span>Zustandsfaktor:</span>
                         <span id="resultCondFactor"></span>
                     </div>
@@ -241,6 +288,22 @@
                     <div class="review-result__factor-row">
                         <span>Wohnsitzfaktor:</span>
                         <span id="resultResidenceFactor"></span>
+                    </div>
+                    <div class="review-result__factor-row">
+                        <span>Ausnützungsreserve:</span>
+                        <span id="resultDevFactor"></span>
+                    </div>
+                </div>
+
+                <div class="review-result__breakdown">
+                    <h3><i class="fas fa-chart-pie"></i> Wertaufschlüsselung</h3>
+                    <div class="review-result__factor-row">
+                        <span>Objekt-Wert:</span>
+                        <span id="resultBuildingValue"></span>
+                    </div>
+                    <div class="review-result__factor-row">
+                        <span>Entwicklungspotenzial:</span>
+                        <span id="resultDevValue"></span>
                     </div>
                 </div>
                 {{ csrf_field() }}
@@ -259,15 +322,20 @@
                     <input type="hidden" name="location_name" id="save_location_name" />
                     <input type="hidden" name="property_type" id="save_property_type" />
                     <input type="hidden" name="area" id="save_area" />
-                    <input type="hidden" name="condition" id="save_condition" />
+                    <input type="hidden" name="plot_area_m2" id="save_plot_area_m2" />
+                    <input type="hidden" name="property_condition" id="save_property_condition" />
                     <input type="hidden" name="equipment" id="save_equipment" />
+                    <input type="hidden" name="micro_location" id="save_micro_location" />
+                    <input type="hidden" name="development_potential" id="save_development_potential" />
                     <input type="hidden" name="residence_status" id="save_residence_status" />
                     <input type="hidden" name="price_per_sqm" id="save_price_per_sqm" />
                     <input type="hidden" name="total_value" id="save_total_value" />
                     <input type="hidden" name="location_factor" id="save_location_factor" />
-                    <input type="hidden" name="condition_factor" id="save_condition_factor" />
+                    <input type="hidden" name="micro_location_factor" id="save_micro_location_factor" />
+                    <input type="hidden" name="property_condition_factor" id="save_property_condition_factor" />
                     <input type="hidden" name="equipment_factor" id="save_equipment_factor" />
                     <input type="hidden" name="residence_status_factor" id="save_residence_status_factor" />
+                    <input type="hidden" name="development_potential_factor" id="save_development_potential_factor" />
                     <input type="hidden" name="country" id="save_country" value="CH" />
                 </form>
 

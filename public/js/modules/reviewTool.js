@@ -60,15 +60,21 @@ const savePlz = document.getElementById('save_plz');
 const saveLocationName = document.getElementById('save_location_name');
 const savePropertyType = document.getElementById('save_property_type');
 const saveArea = document.getElementById('save_area');
+const savePlotArea = document.getElementById('save_plot_area_m2');
 const saveCondition = document.getElementById('save_condition');
 const saveEquipment = document.getElementById('save_equipment');
+const saveMicroLocation = document.getElementById('save_micro_location');
+const saveDevelopmentPotential = document.getElementById('save_development_potential');
 const savePricePerSqm = document.getElementById('save_price_per_sqm');
 const saveTotalValue = document.getElementById('save_total_value');
 const saveLocationFactor = document.getElementById('save_location_factor');
+const saveMicroLocationFactor = document.getElementById('save_micro_location_factor');
 const saveConditionFactor = document.getElementById('save_condition_factor');
 const saveEquipmentFactor = document.getElementById('save_equipment_factor');
 const saveResidenceStatus = document.getElementById('save_residence_status');
 const saveResidenceFactor = document.getElementById('save_residence_status_factor');
+const saveDevelopmentFactor = document.getElementById('save_development_potential_factor');
+const saveCountry = document.getElementById('save_country');
 
 // ===================================================================
 //  State
@@ -297,12 +303,15 @@ async function performCalculation() {
     const plz = plzInput?.value.trim();
     const propertyType = document.getElementById('property_type')?.value;
     const area = document.getElementById('area')?.value;
-    const condition = document.getElementById('condition')?.value;
+    const plotAreaM2 = document.getElementById('plot_area_m2')?.value || 0;
+    const property_condition = document.getElementById('property_condition')?.value;
     const equipment = document.getElementById('equipment')?.value;
+    const microLocation = document.getElementById('micro_location')?.value || 'standard';
+    const developmentPotential = document.getElementById('development_potential')?.value || 'none';
     const residenceStatus = document.getElementById('residence_status')?.value || 'erstwohnsitz';
 
     // Validate that all required fields are filled
-    if (!plz || !propertyType || !area || !condition || !equipment) {
+    if (!plz || !propertyType || !area || !property_condition || !equipment) {
         showFlash('Bitte füllen Sie alle Felder aus.', 'warning');
         return;
     }
@@ -323,8 +332,11 @@ async function performCalculation() {
                 plz: plz,
                 property_type: propertyType,
                 area: parseFloat(area),
-                condition: condition,
+                plot_area_m2: parseFloat(plotAreaM2),
+                property_condition: property_condition,
                 equipment: equipment,
+                micro_location: microLocation,
+                development_potential: developmentPotential,
                 residence_status: residenceStatus,
                 csrf_token: getCsrfToken(),
             }),
@@ -402,6 +414,24 @@ function displayResult(data) {
     if (resultEquipFactor) resultEquipFactor.textContent = data.equipment_factor.toFixed(3).replace('.', ',');
     if (resultResidenceFactor) resultResidenceFactor.textContent = (data.residence_status_factor || 1.0).toFixed(3).replace('.', ',');
 
+    // Display new factors (micro-location, development potential)
+    const resultMicroFactor = document.getElementById('resultMicroFactor');
+    if (resultMicroFactor) resultMicroFactor.textContent = (data.micro_location_factor || 1.0).toFixed(3).replace('.', ',');
+    
+    const resultDevFactor = document.getElementById('resultDevFactor');
+    if (resultDevFactor) resultDevFactor.textContent = (data.development_potential_factor || 1.0).toFixed(3).replace('.', ',');
+
+    // Display effective location factor (macro × micro)
+    const resultEffectiveFactor = document.getElementById('resultEffectiveFactor');
+    if (resultEffectiveFactor) resultEffectiveFactor.textContent = (data.effective_location_factor || 1.0).toFixed(3).replace('.', ',');
+
+    // Display building value and development value breakdown
+    const resultBuildingValue = document.getElementById('resultBuildingValue');
+    if (resultBuildingValue) resultBuildingValue.textContent = formatCurrency(data.building_value || data.total_value, 'CHF');
+    
+    const resultDevValue = document.getElementById('resultDevValue');
+    if (resultDevValue) resultDevValue.textContent = formatCurrency(data.development_value || 0, 'CHF');
+
     // Show result panel
     valuationResult.style.display = 'block';
 console.log('Calculation result displayed:', data);
@@ -412,15 +442,21 @@ console.log('Calculation result displayed:', data);
     if (saveLocationName) saveLocationName.value = data.location_name;
     if (savePropertyType) savePropertyType.value = data.property_type;
     if (saveArea) saveArea.value = data.area;
-    if (saveCondition) saveCondition.value = data.condition;
+    if (savePlotArea) savePlotArea.value = data.plot_area_m2 || '';
+    if (saveCondition) saveCondition.value = data.property_condition;
     if (saveEquipment) saveEquipment.value = data.equipment;
+    if (saveMicroLocation) saveMicroLocation.value = data.micro_location || 'standard';
+    if (saveDevelopmentPotential) saveDevelopmentPotential.value = data.development_potential || 'none';
     if (savePricePerSqm) savePricePerSqm.value = data.price_per_sqm;
     if (saveTotalValue) saveTotalValue.value = data.total_value;
     if (saveLocationFactor) saveLocationFactor.value = data.location_factor;
+    if (saveMicroLocationFactor) saveMicroLocationFactor.value = data.micro_location_factor || 1.0;
     if (saveConditionFactor) saveConditionFactor.value = data.condition_factor;
     if (saveEquipmentFactor) saveEquipmentFactor.value = data.equipment_factor;
     if (saveResidenceStatus) saveResidenceStatus.value = data.residence_status || 'erstwohnsitz';
     if (saveResidenceFactor) saveResidenceFactor.value = data.residence_status_factor || 1.0;
+    if (saveDevelopmentFactor) saveDevelopmentFactor.value = data.development_potential_factor || 1.0;
+    if (saveCountry) saveCountry.value = data.country || 'CH';
 
     // Scroll to result
     valuationResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -433,8 +469,62 @@ function resetForm() {
     if (plzSuggestions) plzSuggestions.style.display = 'none';
     currentCalcData = null;
 
+    // Reset field visibility
+    updatePropertyTypeFields();
+
     // Scroll to top of form
     valuationForm?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Show/hide plot area and development potential fields based on property type.
+ * These fields are only relevant for building types (Einfamilienhaus, Mehrfamilienhaus, etc.).
+ * For apartments (Wohnung) and land (Grundstück), they don't apply.
+ */
+function updatePropertyTypeFields() {
+    const propertyTypeSelect = document.getElementById('property_type');
+    if (!propertyTypeSelect) return;
+
+    const propertyType = propertyTypeSelect.value;
+    
+    // Building types that need plot area and development potential
+    const buildingTypes = ['Einfamilienhaus', 'Mehrfamilienhaus', 'Reihenhaus', 'Doppelhaus'];
+    const needsPlotArea = buildingTypes.includes(propertyType);
+
+    // Show/hide plot area field
+    const plotAreaField = document.getElementById('plot_area_m2')?.closest('.review-form__field');
+    if (plotAreaField) {
+        plotAreaField.style.display = needsPlotArea ? 'block' : 'none';
+    }
+
+    // Show/hide development potential field
+    const devPotentialField = document.getElementById('development_potential')?.closest('.review-form__field');
+    if (devPotentialField) {
+        devPotentialField.style.display = needsPlotArea ? 'block' : 'none';
+    }
+
+    // For apartments, set default values to avoid calculation issues
+    if (!needsPlotArea) {
+        const plotAreaInput = document.getElementById('plot_area_m2');
+        if (plotAreaInput) plotAreaInput.value = '';
+        const devPotentialSelect = document.getElementById('development_potential');
+        if (devPotentialSelect) devPotentialSelect.value = 'none';
+    }
+}
+
+/**
+ * Initialize property type field visibility logic.
+ * Called on page load and when property type changes.
+ */
+function initPropertyTypeFields() {
+    const propertyTypeSelect = document.getElementById('property_type');
+    if (!propertyTypeSelect) return;
+
+    // Set initial visibility
+    updatePropertyTypeFields();
+
+    // Listen for property type changes
+    propertyTypeSelect.addEventListener('change', updatePropertyTypeFields);
 }
 
 // ===================================================================
@@ -683,11 +773,26 @@ async function editValuation(valuation) {
     const areaInput = document.getElementById('area');
     if (areaInput) areaInput.value = valuation.area || '';
 
-    const conditionSelect = document.getElementById('condition');
-    if (conditionSelect) conditionSelect.value = valuation.condition || '';
+    const plotAreaM2Input = document.getElementById('plot_area_m2');
+    if (plotAreaM2Input) plotAreaM2Input.value = valuation.plot_area_m2 || '';
+
+    const conditionSelect = document.getElementById('property_condition');
+    if (conditionSelect) conditionSelect.value = valuation.property_condition || '';
 
     const equipmentSelect = document.getElementById('equipment');
     if (equipmentSelect) equipmentSelect.value = valuation.equipment || '';
+
+    const microLocationSelect = document.getElementById('micro_location');
+    if (microLocationSelect) microLocationSelect.value = valuation.micro_location || 'standard';
+
+    const developmentPotentialSelect = document.getElementById('development_potential');
+    if (developmentPotentialSelect) developmentPotentialSelect.value = valuation.development_potential || 'none';
+
+    const residenceStatusSelect = document.getElementById('residence_status');
+    if (residenceStatusSelect) residenceStatusSelect.value = valuation.residence_status || 'erstwohnsitz';
+
+    // Show/hide plot area and development potential fields based on property type
+    updatePropertyTypeFields();
 
     // Display the result
     if (valuation.price_per_sqm && valuation.total_value) {
@@ -753,7 +858,7 @@ function switchToCalculatorTab() {
 }
 
 function formatCurrency(value, currency = 'CHF') {
-    if (value === null || value === undefined) return '—';
+    if (value === null || value === undefined || isNaN(value)) return '—';
     return new Intl.NumberFormat('de-CH', {
         style: 'decimal',
         minimumFractionDigits: 0,
@@ -771,6 +876,7 @@ export function init() {
     initPlzAutocomplete();
     initCalculation();
     initHistory();
+    initPropertyTypeFields();
 
     // If there's a session-stored result, display it
     const storedResult = document.getElementById('_calc_result');
