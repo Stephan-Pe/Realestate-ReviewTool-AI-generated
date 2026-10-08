@@ -1,9 +1,9 @@
-
 /**
  * Extract CSRF token from the Twig template form element
  */
 function getCsrfToken() {
   const tokenInput = document.querySelector('input[name="csrf_token"]');
+  // console.log("CSRF Token:", tokenInput ? tokenInput.value : "Not found");
   return tokenInput ? tokenInput.value : "";
 }
 
@@ -31,6 +31,7 @@ export function toggleOverlay(show) {
  * Send choice to backend to validate CSRF and attach Set-Cookie header
  */
 async function saveConsent(consentPayload) {
+  console.log('CONSENT FETCH START');
   const csrf = getCsrfToken();
 
   try {
@@ -42,7 +43,7 @@ async function saveConsent(consentPayload) {
       },
       body: JSON.stringify({ ...consentPayload, csrf_token: csrf })
     });
-
+console.log('CONSENT FETCH RESPONSE', response.status, response.url);
     if (!response.ok) {
       throw new Error(`Server returned ${response.status}`);
     }
@@ -60,6 +61,7 @@ async function saveConsent(consentPayload) {
     console.error("Failed to save cookie consent:", error);
   }
 }
+
 /**
  * Initialize banner and bind user action listeners
  */
@@ -90,5 +92,3 @@ export function initCookieConsent() {
     }
   });
 }
-
-

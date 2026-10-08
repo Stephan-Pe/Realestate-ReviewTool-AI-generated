@@ -13,23 +13,23 @@ class CsrfService
      */
 public static function getToken(): string
 {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    // if (session_status() === PHP_SESSION_NONE) {
+    //     session_start();
+    // }
 
-    error_log(
-        'CSRF GET TOKEN: session_id=' . session_id() .
-        ' csrf_before=' . ($_SESSION['csrf_token'] ?? 'EMPTY')
-    );
+    // error_log(
+    //     'CSRF GET TOKEN: session_id=' . session_id() .
+    //     ' csrf_before=' . ($_SESSION['csrf_token'] ?? 'EMPTY')
+    // );
 
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = TokenGenerator::generateRandomString();
     }
 
-    error_log(
-        'CSRF GET TOKEN: session_id=' . session_id() .
-        ' csrf_after=' . $_SESSION['csrf_token']
-    );
+    // error_log(
+    //     'CSRF GET TOKEN: session_id=' . session_id() .
+    //     ' csrf_after=' . $_SESSION['csrf_token']
+    // );
 
     return $_SESSION['csrf_token'];
 }

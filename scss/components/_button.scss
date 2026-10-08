@@ -27,6 +27,17 @@
         visibility: visible;
         opacity: 1;
     }
+    &:hover,
+    &:focus {
+        background-color: rgba($clr_light, 1);
+        color: $clr_dark;
+        border: 2px solid #4a5568;;
+
+        svg {
+            fill: #4a5568;;
+        }
+    }
+
 }
 
 

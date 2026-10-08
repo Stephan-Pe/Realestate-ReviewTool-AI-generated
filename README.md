@@ -1125,3 +1125,6 @@ Bei Fragen oder Anregungen öffnen Sie gerne ein Issue im Repository.
 
 </div>
 # Realestate-ReviewTool-AI-generated
+
+
+https://chatgpt.com/c/6ab78c79-3208-83eb-b759-50552c1b1d38

@@ -56,7 +56,7 @@
         &.open {
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 3rem;
             align-items: center;
             top: 80px;
             left: 0px;
@@ -111,14 +111,20 @@
         
         &__offscreen {
             all: unset;
-            display: flex;
-            flex-direction: row;
+            display: grid;
+            grid-template-columns: 50% 20% 30%;
+            grid-template-rows: auto;
             align-items: center;
-            justify-content: space-around;
+            justify-items: flex-start;
+            gap: 2rem;
+            width: 70%;
+            max-width: 960px;
+            margin: 0 auto;
             a:has(svg){
-                margin: 0 3rem 0 auto;
+                justify-self: flex-end;
             }
             img {
+                justify-self: flex-end;
                 margin-bottom: 0px;
             }
         }

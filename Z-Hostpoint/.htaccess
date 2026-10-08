@@ -1,0 +1,25 @@
+Use php-fpm php82
+
+RewriteEngine On
+RewriteBase /
+
+# Route all requests to the public folder's index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Exclude specific files from rewriting
+RewriteCond %{REQUEST_URI} !^/sw\.js$
+RewriteCond %{REQUEST_URI} !^/manifest\.json$
+
+# Rewrite to public/index.php
+RewriteRule ^(.*)$ index.php?$1 [L,QSA]
+
+# Statische Assets
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|jpg|jpeg|svg|webp|woff2|woff)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+#@__HCP_END__@#
+# Anything after the comment above is left alone

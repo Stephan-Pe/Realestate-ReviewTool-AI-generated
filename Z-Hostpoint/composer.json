@@ -1,0 +1,26 @@
+{
+  "require": {
+    "twig/twig": "^3.28",
+    "symfony/http-client": "^6.0",
+    "nyholm/psr7": "^1.5",
+    "phpmailer/phpmailer": "^6.9",
+    "twig/intl-extra": "^3.4",
+    "twig/string-extra": "^3.10",
+    "twig/extra-bundle": "^3.8",
+    "symfony/polyfill-intl-icu": "^1.33",
+    "php": "^8.0",
+    "pragmarx/google2fa": "^9.0",
+    "endroid/qr-code": "^6.0",
+    "symfony/http-foundation": "^7.4",
+    "doctrine/orm": "^3.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Core\\": "Core/",
+      "App\\": "App/"
+    }
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.2"
+  }
+}

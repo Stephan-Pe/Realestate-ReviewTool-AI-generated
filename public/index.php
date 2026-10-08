@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * Front Controller
  * 
@@ -16,7 +17,6 @@
 $envFile = file_exists(__DIR__ . '/../.env') ? parse_ini_file(__DIR__ . '/../.env') : [];
 $_SERVER['APP_ENV'] = $envFile['APP_ENV'] ?? 'prod';
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 /**
@@ -66,6 +66,13 @@ function sec_session_start()
     ]);
 
     session_start();
+}
+
+$sessionToken = $_SESSION['csrf_token'] ?? '';
+
+// Ensure session token exists
+if (empty($sessionToken)) {
+    $sessionToken = \App\Services\CsrfService::getToken();
 }
 
 
@@ -135,6 +142,12 @@ $router->add('{controller}/{id:\d+}/{action}');
 
 // Admin Route
 $router->add('admin/{controller}/{action}', ['namespace' => 'Admin']);
+error_log(
+    'CSRF CHECK: ' .
+        'session_id=' . session_id() .
+        ' session_token=' . ($_SESSION['csrf_token'] ?? 'NOT SET') .
+        ' header_token=' . ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? 'NOT SET')
+);
 
 // ===================================================================
 //  CSRF Protection (POST only)
@@ -210,12 +223,24 @@ if (!in_array($rawUrl, $allowed)) {
     echo '404 — Not Found';
     exit;
 }
+error_log('===== INDEX.PHP REACHED =====');
+
+error_log(sprintf(
+    'REQUEST: %s %s | HOST=%s | CONTENT_TYPE=%s',
+    $_SERVER['REQUEST_METHOD'] ?? '',
+    $_SERVER['REQUEST_URI'] ?? '',
+    $_SERVER['HTTP_HOST'] ?? '',
+    $_SERVER['CONTENT_TYPE'] ?? ''
+));
+
 // // Display the routing table
 // echo '<pre>';
 // var_dump($router->getRoutes());
 // echo htmlspecialchars(print_r($router->getRoutes(), true));
 // echo '</pre>';
-
+// echo '<pre>';
+// var_dump($allowedRoutes);
+// echo '</pre>';
 
 // URL is whitelisted → safe to dispatch
 $router->dispatch($rawUrl);

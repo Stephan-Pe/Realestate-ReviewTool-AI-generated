@@ -9,7 +9,7 @@ import { togglePwd } from './modules/togglePwd.js';
 import { init } from "./modules/validation.js";
 import { showMap } from "./modules/showMap.js";
 import { init as initReviewTool } from "./modules/reviewTool.js";
-
+import { initCookieConsent } from "./modules/cookieConsent.js";
 
 const container = document.querySelector('.container');
 const baseURI = window.location.origin + '/';
@@ -27,11 +27,19 @@ const galleryEditInput = document.querySelector('[data-editGalleryFile]');
 
 const contactForm = document.querySelector('#contactForm');
 const slideBtn = document.querySelectorAll('.slide-Btn');
+// disable for dev mode - enable for production
+const isDev =
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1" ||
+  location.hostname.endsWith(".immo.test") ||
+  location.hostname === "immo.test";
 
 window.addEventListener('DOMContentLoaded', () => {
     init();
     initReviewTool();
 });
+// Call the function when the DOM is ready
+document.addEventListener("DOMContentLoaded", initCookieConsent);
 
 window.addEventListener("load", (event) => {
 
@@ -114,3 +122,25 @@ window.addEventListener('scroll', function (e) {
     ticking = true;
   }
 });
+
+const registerServiceWorker = async () => {
+  if ("serviceWorker" in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        scope: "/"
+      });
+      if (isDev) {
+        console.log(
+          "Service worker registered with scope:",
+          registration.scope
+        );
+      } else {
+        console.log("Have a great day! :)");
+      }
+    } catch (error) {
+      if (isDev) {
+        console.error("Service worker registration failed:", error);
+      }
+    }
+  }
+};

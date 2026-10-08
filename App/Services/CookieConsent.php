@@ -4,33 +4,32 @@ namespace App\Services;
 
 class CookieConsent
 {
-    private array $default = [
+    private static array $default = [
         'analytics' => false,
         'marketing' => false,
         'necessary' => true
     ];
 
     /**
-     * Get the current cookie consent state
-     * Returns default if no consent cookie exists
+     * Retrieve the current consent choices from the request cookie header
      */
     public static function getConsent(): array
     {
         if (!self::hasConsent()) {
-            return (new self())->default;
+            return self::$default;
         }
 
         $decoded = json_decode($_COOKIE['cookie_consent'], true);
 
         if (!is_array($decoded)) {
-            return (new self())->default;
+            return self::$default;
         }
 
-        return array_merge((new self())->default, $decoded);
+        return array_merge(self::$default, $decoded);
     }
 
     /**
-     * Check if user has given any consent (cookie exists)
+     * Check if the user has already made a consent decision
      */
     public static function hasConsent(): bool
     {
@@ -38,28 +37,10 @@ class CookieConsent
     }
 
     /**
-     * Check if analytics cookies are allowed
+     * Helper for template rendering decisions
      */
-    public function hasAnalyticsConsent(): bool
+    public static function isPending(): bool
     {
-        $consent = $this->getConsent();
-        return (bool)($consent['analytics'] ?? false);
-    }
-
-    /**
-     * Check if marketing cookies are allowed
-     */
-    public function hasMarketingConsent(): bool
-    {
-        $consent = $this->getConsent();
-        return (bool)($consent['marketing'] ?? false);
-    }
-
-    /**
-     * Check if user has not yet given consent (first visit)
-     */
-    public function isPending(): bool
-    {
-        return !$this->hasConsent();
+        return !self::hasConsent();
     }
 }

@@ -1,5 +1,5 @@
 const CACHE_VERSION = 1.14;
-const SW_NAME = 'projectpage-test';
+const SW_NAME = 'reviewtool';
 const STATIC_NAME = `${SW_NAME + CACHE_VERSION}`;
 const STATIC_ASSETS = [
   '/'

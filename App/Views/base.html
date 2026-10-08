@@ -168,10 +168,6 @@
     <!-- build:js -->
     <script type="module" src="{{ asset('js/main.min.js') }}"></script>
     <!-- endbuild -->
-   <script type="module" defer>
-       import { initCookieConsent } from '/js/modules/cookieConsent.js';
-       document.addEventListener('DOMContentLoaded', initCookieConsent);
-   </script>
 
 
     {% block footer %} {% endblock %}

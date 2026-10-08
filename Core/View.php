@@ -100,31 +100,24 @@ class View
         // Calculate the Content-Length
         $contentLength = strlen($content);
         // Set the Content-Length header
-        if (!headers_sent()) {
+      if (!headers_sent()) {
             if (Auth::getUser()) {
 
                 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
                 header('Pragma: no-cache');
                 header('Expires: 0');
-                header("Content-Length: " . $contentLength);
-                header("Service-Worker-Allowed: /sw.js");
-                header("X-Content-Type-Options: nosniff");
-                header("X-Frame-Options: DENY");
-                header("X-XSS-Protection: 1; mode=block");
-                header("Referrer-Policy: strict-origin-when-cross-origin");
-                header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
             } else {
 
                 header("Cache-Control: max-age=604800, must-revalidate");
                 header("Pragma: cache");
-                header("Content-Length: " . $contentLength);
-                header("Service-Worker-Allowed: /sw.js");
-                header("X-Content-Type-Options: nosniff");
-                header("X-Frame-Options: DENY");
-                header("X-XSS-Protection: 1; mode=block");
-                header("Referrer-Policy: strict-origin-when-cross-origin");
-                header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
             }
+            header("Content-Length: " . $contentLength);
+            header("Service-Worker-Allowed: /sw.js");
+            header("X-Content-Type-Options: nosniff");
+            header("X-Frame-Options: DENY");
+            header("X-XSS-Protection: 1; mode=block");
+            header("Referrer-Policy: strict-origin-when-cross-origin");
+            header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
         }
         return $content;
     }
