@@ -247,3 +247,74 @@ Beim Vergleich der Quadratmeter- und Objektpreise für Wohneigentum (Einfamilien
 2. **Tourismusgemeinden:** Hoher Druck durch Zweitwohnungsinitiative und Auslandsnachfrage. Das Angebot ist stark limitiert, was zu überdurchschnittlichen Spitzenpreisen führt.
 3. **Intermediäre Gemeinden:** Profitieren vom Ausweichdruck aus den Städten ("Pendlergürtel"). Sie bieten Kompromisse aus Erreichbarkeit und tragbaren Quadratmeterpreisen.
 4. **Ländliche Gemeinden:** Grössere Grundstücksflächen zum vergleichsweise niedrigsten Quadratmeterpreis, jedoch eingeschränktere Erschliessung und längere Pendelzeiten.
+
+
+In der Schweizer Immobilienbewertung (insbesondere bei den marktbeherrschenden **hedonischen Modellen** von Anbietern wie Wüest Partner, IAZI oder Fahrländer Partner) wird der Quadratmeterpreis bzw. Gesamtwert nicht durch eine starre Formel mit festen Prozent-Gewichten für Jedermann berechnet. Stattdessen nutzen die Algorithmen **multivariate Regressionsanalysen**, die anhand von zehntausenden realen Handänderungen (Kaufverkäufen) laufend kalibriert werden.
+
+Die Gewichtung der einzelnen Faktoren variiert je nach Objektart (Einfamilienhaus vs. Eigentumswohnung) und Region. Dennoch lässt sich die mathematische Struktur und die relative Gewichtung der von Ihnen genannten Faktoren aufschlüsseln.
+
+---
+
+### 1. Mathematische Grundstruktur (Hedonischer Ansatz)
+
+Hedonische Modelle basieren meist auf einem **logarithmischen oder semi-logarithmischen Ansatz**, weil Preise nicht linear mit der Fläche wachsen (eine doppelt so grosse Wohnung kostet selten exakt das Doppelte pro m²).
+
+Vereinfacht dargestellt sieht die Regressionsgleichung so aus:
+
+$$\ln(\text{Preis}) = \beta_0 + \sum (\beta_i \cdot \text{Faktor}_i) + \varepsilon$$
+
+Oder als marktübliches Multiplikatoren-Modell für den Quadratmeterpreis ($m^2$-Preis):
+
+$$\text{Preis per m}^2 = \text{Basispreis}_\text{Region} \times f(\text{Makro}) \times f(\text{Mikro}) \times f(\text{Fläche}) \times f(\text{Zimmer}) \times f(\text{Zustand}) \times f(\text{Ausstattung}) \times f(\text{Wohnsitz})$$
+
+---
+
+### 2. Relative Gewichtung der Faktoren (Ranking nach Einfluss)
+
+In der Praxis gewichten die Schweizer Algorithmen die Preis Treiber in etwa wie folgt (absteigend nach ihrer statistischen Varianzaufklärung):
+
+| Rang | Faktor | Geschätzte relative Gewichtung | Einfluss & Wirkungsweise |
+| --- | --- | --- | --- |
+| **1** | **Mikrolage** | **ca. 30 – 40 %** | Der absolute Hauptpreistreiber (Besonnung, Aussicht, Lärmimmissionen, Steuerfuss der Gemeinde, ÖV-Güteklasse). |
+| **2** | **Trendfaktor (Makrolage)** | **ca. 15 – 20 %** | Regionale Markt- und Wirtschaftsregion (z.B. Wirtschaftsraum Zürich/Genfersee vs. ländliches Berggebiet), Dynamik von Angebot und Nachfrage. |
+| **3** | **Wohnfläche & Zimmeranzahl** | **ca. 15 – 20 %** | Die Grösse skaliert den Gesamtpreis massiv. Die Zimmeranzahl wirkt als Strukturfaktor (Aufteilung der m²). |
+| **4** | **Ausstattung & Zustand** | **ca. 10 – 15 %** | Materialisierung (einfach, gehoben, Luxus), Sanierungsstand, Alter der Küche/Bäder, MINERGIE-Standard etc. |
+| **5** | **Objektart & Wohnsitzart** | **ca. 5 – 10 %** | Unterschied EFH vs. ETW; bei Zweitwohnungen greifen oft regulatorische Effekte (Zweitwohnungsgesetz im Berggebiet, Lex Koller). |
+
+---
+
+### 3. Detailanalyse der einzelnen Faktoren und ihrer Funktionsweise
+
+#### A. Makrolage & Trendfaktor ($f_\text{Makro}$)
+
+* **Wirkung:** Bezieht sich auf die Gemeinde und Region. Die Steuerbelastung der Gemeinde fliesst hier direkt als monetärer Barwert in die Bewertung ein (tiefe Steuern = höhere Zahlungsbereitschaft der Käufer = höherer m²-Preis).
+* **Trend:** Bildet die historische und aktuelle Preisentwicklung der Region ab.
+
+#### B. Mikrolage ($f_\text{Mikro}$)
+
+* **Wirkung:** Parzellenspezifisch. Eine Liegenschaft in derselben Gemeinde kann allein durch unverbaubare Seesicht oder absolute Ruhelage (keine Lärmbelastung durch Strasse/Bahn) einen Aufschlag von **20 % bis über 50 %** gegenüber einer Nachbarliegenschaft an einer Hauptstrasse erzielen.
+
+#### C. Wohnfläche & Anzahl Zimmer ($f_\text{Fläche}, f_\text{Zimmer}$)
+
+* **Fläche:** Wirkt degressiv. Verdoppelt sich die Wohnfläche, steigt der Gesamtpreis meist nur um Faktor 1.6 bis 1.8, da Fixkosten (Küche, Bäder, Erschliessung) prozentual sinken.
+* **Zimmeranzahl:** Korreliert stark mit der Fläche, steuert aber die **Grundriss-Effizienz**. Bei gleicher Wohnfläche von 120 m² erzielt eine gut geschnittene 4.5-Zimmer-Wohnung oft einen anderen m²-Preis als eine loftartige 2.5-Zimmer-Wohnung. Zusätzliche halbe Zimmer (Reduit, Büro) geben einen moderaten Zusatzwert (ca. 3–5 % Aufschlag im hedonischen Modell).
+
+#### D. Zustand & Ausstattung ($f_\text{Zustand}, f_\text{Ausstattung}$)
+
+* **Skalierung:**
+* *Einfach/Renovierungsbedürftig:* Abschlag von oft 15–25 % gegenüber dem Standard (Notwendigkeit von Investitionen).
+* *Gehoben (Standard heute):* Basis des Modells (0 % Korrektur).
+* *Luxus:* Individuelle Aufschläge (20 % bis 50%+), wobei hedonische Modelle im absoluten Luxussegment oft an ihre Grenzen stoßen, da dort der "Liebhaberwert" dominiert.
+
+
+
+#### E. Wohnsitzart (Erst- vs. Zweitwohnung)
+
+* **Wirkung:** In der Schweiz (speziell in Tourismuskantonen wie Graubünden, Wallis, Bern/Oberland) hat die Zweitwohnungseigenschaft ("Ferienimmobilie") eine starke steuernde Wirkung. Seit dem Zweitwohnungsgesetz (ZWG) sind Zweitwohnungen in vielen Gemeinden kontingentiert. Das treibt den Wert von bestehenden Zweitwohnungen (Bestandsschutz) massiv nach oben, während reine Erstwohnungs-Pflichtobjekte für einheimische Käufer preislich anders abgestützt sind.
+
+---
+
+### Zusammenfassung für die Praxis
+
+Wenn Sie den Quadratmeterpreis einer Schweizer Immobilie modellieren möchten, starten Sie immer mit dem **Median-Quadratmeterpreis der Gemeinde (Makro/Mikro-Basis)** und multiplizieren diesen sequenziell mit den prozentualen Zu- oder Abschlägen der Objektdetails (Grösse, Zimmerstruktur, Baujahr, Zustand und Sonderstatus wie Zweitwohnung).
+

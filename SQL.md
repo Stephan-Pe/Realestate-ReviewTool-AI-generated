@@ -35,11 +35,11 @@ SET macro_location_factor = CASE plz
     WHEN '7019' THEN 1.08  -- Fidaz
 
     -- Prättigau / Davos
-    WHEN '7250' THEN 1.50  -- Klosters
+    WHEN '7250' THEN 1.55  -- Klosters
     WHEN '7252' THEN 1.45  -- Klosters Dorf
-    WHEN '7260' THEN 1.73  -- Davos Dorf
+    WHEN '7260' THEN 1.60  -- Davos Dorf
     WHEN '7265' THEN 1.45  -- Davos Wolfgang
-    WHEN '7270' THEN 1.65  -- Davos Platz
+    WHEN '7270' THEN 1.55  -- Davos Platz
     WHEN '7272' THEN 1.40  -- Davos Clavadel
     WHEN '7276' THEN 1.38  -- Davos Frauenkirch
     WHEN '7277' THEN 1.30  -- Davos Glaris
@@ -68,10 +68,10 @@ SET macro_location_factor = CASE plz
 
     -- Engadin
     WHEN '7500' THEN 2.35  -- St. Moritz
-    WHEN '7503' THEN 1.87  -- Samedan
-    WHEN '7504' THEN 1.82  -- Pontresina
+    WHEN '7503' THEN 1.77  -- Samedan
+    WHEN '7504' THEN 1.72  -- Pontresina
     WHEN '7505' THEN 1.70  -- Celerina
-    WHEN '7512' THEN 2.05  -- Champfèr
+    WHEN '7512' THEN 1.50  -- Champfèr
     WHEN '7513' THEN 1.85  -- Silvaplana
     WHEN '7514' THEN 1.72  -- Sils Maria
     WHEN '7515' THEN 1.65  -- Sils Baselgia

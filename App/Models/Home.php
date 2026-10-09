@@ -325,7 +325,13 @@ class Home extends \Core\Model
     // ====================================================================
 
     /**
-     * Get base price per m² by property type (Switzerland / Graubünden)
+     * Cache for base prices loaded from the database.
+     * @var array|null
+     */
+    private static ?array $basePriceCache = null;
+
+    /**
+     * Get base price per m² by property type from the base_prices table.
      *
      * Step 1: Determine the BASE PRICE per m² based on property type.
      *         These are reference values for a 'standard' property in a 'normal' location.
@@ -336,19 +342,26 @@ class Home extends \Core\Model
      */
     public static function getBasePrice(string $propertyType): float
     {
-        // Base price reference values for a standard property in a neutral location
-        // These values represent the starting point before any multipliers are applied
-        $basePrices = [
-            'Einfamilienhaus'  => 8188.00,  // Single-family home: higher base due to land value
-            'Mehrfamilienhaus' => 6772.00,  // Multi-family: lower per-unit due to economies of scale
-            'Wohnung'          => 9026.00,  // Apartment: premium per m² (no land cost spread)
-            'Reihenhaus'       => 7400.00,  // Townhouse: mid-range
-            'Doppelhaus'       => 7900.00,  // Semi-detached: near single-family pricing
-            'Grundstück'       => 1000.00,  // Land: much lower, priced per m² raw
-        ];
-        // If an unknown property type is passed, fall back to 5000 CHF/m² as a generic default
-        return $basePrices[$propertyType] ?? 5000.00;
+        // Load base prices from database if not already cached
+        if (static::$basePriceCache === null) {
+            $db = static::getDB();
+            $sql = 'SELECT `property_type`, `base_price_per_sqm` FROM base_prices';
+            $stmt = $db->query($sql);
+            static::$basePriceCache = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                static::$basePriceCache[$row['property_type']] = (float) $row['base_price_per_sqm'];
+            }
+        }
+
+        // Return the base price for the given property type, or fall back to 5000 CHF/m²
+        return static::$basePriceCache[$propertyType] ?? 5000.00;
     }
+
+    /**
+     * Cache for condition factors loaded from the database.
+     * @var array|null
+     */
+    private static ?array $conditionFactorCache = null;
 
     /**
      * Get condition factor (Step 3: Adjust price based on property condition)
@@ -363,18 +376,20 @@ class Home extends \Core\Model
      */
     public static function getConditionFactor(string $property_condition): float
     {
-        // Condition factors: each represents a percentage adjustment from the standard (1.00)
-        // 'gepflegt' (well-maintained) is the baseline = 1.00 (no adjustment)
-        $factors = [
-            'neuwertig'            => 1.20,   // New: +20% premium (like-new condition, minimal wear)
-            'renoviert'            => 1.10,   // Renovated: +10% premium (recently updated)
-            'gepflegt'             => 1.00,   // Well-maintained: baseline (100% of base value)
-            'sanierungsbedürftig'  => 0.85,   // Needs renovation: -15% discount (major repairs needed)
-            'renierungsbedürftig'  => 0.70,   // Needs major repair: -30% discount (significant deterioration)
-        ];
+        // Load condition factors from database if not already cached
+        if (static::$conditionFactorCache === null) {
+            $db = static::getDB();
+            $sql = 'SELECT `property_condition`, `factor` FROM condition_factors';
+            $stmt = $db->query($sql);
+            static::$conditionFactorCache = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                static::$conditionFactorCache[strtolower($row['property_condition'])] = (float) $row['factor'];
+            }
+        }
+
         // Normalize input to lowercase for case-insensitive matching
         // Default to 1.00 (standard) if condition is unknown
-        return $factors[strtolower($property_condition)] ?? 1.00;
+        return static::$conditionFactorCache[strtolower($property_condition)] ?? 1.00;
     }
 
     /**
@@ -798,8 +813,7 @@ class Home extends \Core\Model
         return [
             ['value' => 'erstwohnsitz', 'label' => 'Erstwohnsitz', 'factor' => 1.00],
             ['value' => 'zweitwohnsitz', 'label' => 'Zweitwohnsitz (Standard)', 'factor' => 1.18],
-            ['value' => 'zweitwohnsitz_privilegiert', 'label' => 'Zweitwohnsitz (Privilegiert / Altrecht)', 'factor' => 1.20],
-            ['value' => 'feriendomizil', 'label' => 'Feriendomizil', 'factor' => 1.00],
+            ['value' => 'zweitwohnsitz_privilegiert', 'label' => 'Zweitwohnsitz (Privilegiert / Altrecht)', 'factor' => 1.20]
         ];
     }
 
