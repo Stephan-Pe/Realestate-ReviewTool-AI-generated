@@ -31,6 +31,7 @@ class Home extends \Core\Model
     private static array $residenceFactorCache = [];
     public ?float $area = null;
     public ?float $plot_area_m2 = null;
+    public ?float $rooms = null;
     public ?string $property_condition = null;
     public ?string $equipment = null;
     public ?string $micro_location = null;
@@ -47,6 +48,9 @@ class Home extends \Core\Model
     public ?float $building_value = null;
     public ?float $development_value = null;
     public ?float $effective_location_factor = null;
+    public ?float $size_multiplier = null;
+    public ?float $wohnflaeche = null;
+    public ?float $zimmer = null;
     public ?float $macro_location_factor = null;
     public ?float $trend_factor = null;
     public ?float $trend_factor_2019 = null;
@@ -140,13 +144,13 @@ class Home extends \Core\Model
                 (plz, location_name, country, property_type, area, plot_area_m2, property_condition,
                  equipment, micro_location, development_potential, residence_status,
                  price_per_sqm, total_value, location_factor, micro_location_factor,
-                 condition_factor, equipment_factor, residence_status_factor,
+                 condition_factor, equipment_factor, residence_status_factor, rooms,
                  development_potential_factor, created_at, updated_at)
                 VALUES
                 (:plz, :location_name, :country, :property_type, :area, :plot_area_m2, :property_condition,
                  :equipment, :micro_location, :development_potential, :residence_status,
                  :price_per_sqm, :total_value, :location_factor, :micro_location_factor,
-                 :condition_factor, :equipment_factor, :residence_status_factor,
+                 :condition_factor, :equipment_factor, :residence_status_factor, :rooms,
                  :development_potential_factor, NOW(), NOW())';
 
         $db = static::getDB();
@@ -171,6 +175,7 @@ class Home extends \Core\Model
         $stmt->bindValue(':equipment_factor', $this->equipment_factor, PDO::PARAM_STR);
         $stmt->bindValue(':residence_status_factor', $this->residence_status_factor ?? 1.0, PDO::PARAM_STR);
         $stmt->bindValue(':development_potential_factor', $this->development_potential_factor ?? 1.0, PDO::PARAM_STR);
+        $stmt->bindValue(':rooms', $this->rooms, PDO::PARAM_STR);
 
         $stmt->execute();
         return (int) $db->lastInsertId();
@@ -207,6 +212,7 @@ class Home extends \Core\Model
                     condition_factor = :condition_factor,
                     equipment_factor = :equipment_factor,
                     residence_status_factor = :residence_status_factor,
+                    rooms = :rooms,
                     development_potential_factor = :development_potential_factor,
                     updated_at = NOW()
                 WHERE id = :id';
@@ -234,7 +240,7 @@ class Home extends \Core\Model
         $stmt->bindValue(':equipment_factor', $this->equipment_factor, PDO::PARAM_STR);
         $stmt->bindValue(':residence_status_factor', $this->residence_status_factor ?? 1.0, PDO::PARAM_STR);
         $stmt->bindValue(':development_potential_factor', $this->development_potential_factor ?? 1.0, PDO::PARAM_STR);
-
+        $stmt->bindValue(':rooms', $this->rooms, PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -452,32 +458,14 @@ class Home extends \Core\Model
      * @param string $residenceStatus
      * @return array
      */
-    /**
+/**
      * Calculate a full valuation using the THREE-LAYER MODEL (per Refactoring.md).
-     *
-     * OVERALL FORMULA (per Refactoring.md example):
-     *   effective_location_factor = macro_location_factor × micro_location_factor
-     *   price_per_m² = base_price × effective_location_factor × condition_factor
-     *                × equipment_factor × residence_status_factor × development_potential_factor
-     *   total_value = price_per_m² × area
-     *
-     * EXAMPLE (from Refactoring.md):
-     *   PLZ 7260 (Davos), Einfamilienhaus, 150m², 600m² plot
-     *   base_price = 8188.00
-     *   macro_location = 1.60
-     *   micro_location = 1.15 (bevorzugte Lage)
-     *   property_condition = 1.00 (gepflegt)
-     *   equipment = 1.00 (standard)
-     *   residence = 1.00 (erstwohnsitz)
-     *   development = 1.12 (grosses Grundstück mit Ausbaureserve)
-     *   effective_location = 1.60 × 1.15 = 1.84
-     *   price_per_m² = 8188 × 1.84 × 1.00 × 1.00 × 1.00 × 1.12 = 16,873.34 CHF/m²
-     *   total_value = 16,873.34 × 150 = 2,531,001.00 CHF
      *
      * @param string $plz
      * @param string $propertyType
      * @param float  $area
      * @param float  $plotAreaM2
+     * @param float  $zimmer  <-- Added parameter for room count
      * @param string $property_condition
      * @param string $equipment
      * @param string $microLocation
@@ -490,6 +478,7 @@ class Home extends \Core\Model
         string $propertyType,
         float $area,
         float $plotAreaM2,
+        float $zimmer,
         string $property_condition,
         string $equipment,
         string $microLocation,
@@ -500,38 +489,30 @@ class Home extends \Core\Model
         $location = static::getLocationByPLZ($plz);
 
         // ---- LAYER 1: Enhanced Location Factors ----
-        // Get macro location factor (PLZ-level)
         $macroLocationFactor = is_array($location) && isset($location['macro_location_factor'])
             ? (float) $location['macro_location_factor']
             : 1.00;
 
-        // Get micro location factor (quality of specific location within PLZ)
         $microLocationFactor = static::getMicroLocationFactor($microLocation);
 
         // Effective location factor = macro × micro
         $effectiveLocationFactor = $macroLocationFactor * $microLocationFactor;
 
-        // Also fetch the trend_factor for residence status lookup
-        $trendFactor = $macroLocationFactor; // macro_location_factor serves as trend_factor
+        $trendFactor = $macroLocationFactor; 
 
         // ---- LAYER 2: Property Characteristics ----
-        // Get base price per m² for the property type
         $basePrice = static::getBasePrice($propertyType);
-
-        // Get condition factor
         $conditionFactor = static::getConditionFactor($property_condition);
-
-        // Get equipment factor
         $equipmentFactor = static::getEquipmentFactor($equipment);
-
-        // Get residence status factor
         $residenceFactor = static::getResidenceStatusFactor($residenceStatus, $trendFactor);
-
-        // Get development potential factor
         $developmentFactor = static::getDevelopmentPotentialFactor($developmentPotential);
 
-        // Calculate price per m² (includes ALL factors per Refactoring.md)
+        // ** INTEGRATION: Size & Room Multiplier (Degression & Density) **
+        $sizeMultiplier = static::berechneGroessenMultiplikator($area, $zimmer);
+
+        // Calculate price per m² (now including size/room scaling)
         $pricePerSqm = $basePrice
+            * $sizeMultiplier  // <--- Integrated here
             * $effectiveLocationFactor
             * $conditionFactor
             * $equipmentFactor
@@ -541,8 +522,14 @@ class Home extends \Core\Model
         // Calculate total property value
         $totalValue = $pricePerSqm * $area;
 
-        // Calculate building value (without development potential)
-        $buildingValuePerSqm = $basePrice * $effectiveLocationFactor * $conditionFactor * $equipmentFactor * $residenceFactor;
+        // Calculate building value (without development potential, includes size factor)
+        $buildingValuePerSqm = $basePrice
+            * $sizeMultiplier  // <--- Integrated here too
+            * $effectiveLocationFactor
+            * $conditionFactor
+            * $equipmentFactor
+            * $residenceFactor;
+            
         $buildingValue = $buildingValuePerSqm * $area;
         $developmentValue = $totalValue - $buildingValue;
 
@@ -550,7 +537,7 @@ class Home extends \Core\Model
         $locationName = is_array($location) ? ($location['city'] ?? 'Unbekannt') : 'Unbekannt';
         $country      = is_array($location) ? ($location['country'] ?? 'CH') : 'CH';
 
-        // Return all calculation results
+        // Return all calculation results (added rooms & size_multiplier for tracking)
         return [
             'plz'                          => $plz,
             'location_name'                => $locationName,
@@ -558,6 +545,7 @@ class Home extends \Core\Model
             'property_type'                => $propertyType,
             'area'                         => $area,
             'plot_area_m2'                 => $plotAreaM2,
+            'rooms'                        => $zimmer, // <--- Track input rooms
             'property_condition'           => $property_condition,
             'equipment'                    => $equipment,
             'micro_location'               => $microLocation,
@@ -570,6 +558,7 @@ class Home extends \Core\Model
             'location_factor'              => $macroLocationFactor,
             'micro_location_factor'        => $microLocationFactor,
             'effective_location_factor'    => $effectiveLocationFactor,
+            'size_multiplier'              => $sizeMultiplier, // <--- Track computed factor
             'condition_factor'             => $conditionFactor,
             'equipment_factor'             => $equipmentFactor,
             'residence_status_factor'      => $residenceFactor,
@@ -577,10 +566,20 @@ class Home extends \Core\Model
         ];
     }
 
-    // ====================================================================
-    //  FORMULA OPTIONS (for UI)
-    // ====================================================================
+    /**
+     * Helper method to compute the area and room count multiplier.
+     */
+    protected static function berechneGroessenMultiplikator(float $wohnflaeche, float $zimmer): float {
+        $basisFlaeche = 100.0;
+        $alpha = -0.18; 
+        $flaechenFaktor = pow($wohnflaeche / $basisFlaeche, $alpha);
 
+        $erwarteteZimmer = max(1.0, $wohnflaeche / 28.0);
+        $beta = 0.08; 
+        $zimmerFaktor = pow($zimmer / $erwarteteZimmer, $beta);
+
+        return round($flaechenFaktor * $zimmerFaktor, 4);
+    }
     /**
      * Get sales images for admin (stub — review tool only)
      *

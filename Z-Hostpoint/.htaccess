@@ -1,17 +1,18 @@
 Use php-fpm php82
 
+# Remove the question mark from the request but maintain the query string
+
 RewriteEngine On
 RewriteBase /
 
-# Route all requests to the public folder's index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Exclude specific files from rewriting
+# Exclude specific files from the rewriting rule
+
 RewriteCond %{REQUEST_URI} !^/sw\.js$
 RewriteCond %{REQUEST_URI} !^/manifest\.json$
 
-# Rewrite to public/index.php
 RewriteRule ^(.*)$ index.php?$1 [L,QSA]
 
 # Statische Assets

@@ -60,6 +60,7 @@ const savePlz = document.getElementById('save_plz');
 const saveLocationName = document.getElementById('save_location_name');
 const savePropertyType = document.getElementById('save_property_type');
 const saveArea = document.getElementById('save_area');
+const saveZimmer = document.getElementById('save_zimmer');
 const savePlotArea = document.getElementById('save_plot_area_m2');
 const saveCondition = document.getElementById('save_condition');
 const saveEquipment = document.getElementById('save_equipment');
@@ -303,6 +304,7 @@ async function performCalculation() {
     const plz = plzInput?.value.trim();
     const propertyType = document.getElementById('property_type')?.value;
     const area = document.getElementById('area')?.value;
+    const rooms = document.getElementById('rooms')?.value;
     const plotAreaM2 = document.getElementById('plot_area_m2')?.value || 0;
     const property_condition = document.getElementById('property_condition')?.value;
     const equipment = document.getElementById('equipment')?.value;
@@ -311,7 +313,7 @@ async function performCalculation() {
     const residenceStatus = document.getElementById('residence_status')?.value || 'erstwohnsitz';
 
     // Validate that all required fields are filled
-    if (!plz || !propertyType || !area || !property_condition || !equipment) {
+    if (!plz || !propertyType || !area || !rooms || !property_condition || !equipment) {
         showFlash('Bitte füllen Sie alle Felder aus.', 'warning');
         return;
     }
@@ -332,6 +334,7 @@ async function performCalculation() {
                 plz: plz,
                 property_type: propertyType,
                 area: parseFloat(area),
+                rooms: parseFloat(rooms),
                 plot_area_m2: parseFloat(plotAreaM2),
                 property_condition: property_condition,
                 equipment: equipment,
@@ -343,7 +346,7 @@ async function performCalculation() {
         });
 
         const data = await response.json();
-
+        console.log('Calculation response:', data);
         if (!response.ok || !data.success) {
             showFlash(data.error || 'Berechnung fehlgeschlagen.', 'warning');
             return;
@@ -442,6 +445,7 @@ console.log('Calculation result displayed:', data);
     if (saveLocationName) saveLocationName.value = data.location_name;
     if (savePropertyType) savePropertyType.value = data.property_type;
     if (saveArea) saveArea.value = data.area;
+    if (saveZimmer) saveZimmer.value = data.zimmer || '';
     if (savePlotArea) savePlotArea.value = data.plot_area_m2 || '';
     if (saveCondition) saveCondition.value = data.property_condition;
     if (saveEquipment) saveEquipment.value = data.equipment;
@@ -615,12 +619,64 @@ function initHistory() {
         });
     }
 }
+// async function loadHistory() {
+//     if (!historyList) return;
 
+//     historyList.innerHTML = '<p class="review-history__empty">Lade Bewertungen…</p>';
+//     const csrfToken = document.querySelector('meta[name="csrf_token"]')?.content;
+//     const params = new URLSearchParams({
+//         search: historySearchTerm,
+//         page: historyPage,
+//         per_page: historyPageSize,
+//     });
+
+//     try {
+//         const response = await fetch(`/homes/list?${params.toString()}`, {
+//             headers: {
+//                 'X-Requested-With': 'XMLHttpRequest',
+//                 'X-CSRF-TOKEN': csrfToken,
+//                 'Accept': 'application/json',
+//             },
+//         });
+
+//         // 1. Get the raw text first instead of response.json()
+//         const rawText = await response.text();
+
+//         let data;
+//         try {
+//             data = JSON.parse(rawText);
+//         } catch (jsonError) {
+//             // 2. If it fails, log the exact server output to your console!
+//             console.error("❌ Server returned non-JSON text:", rawText);
+//             throw new Error("Server response is not valid JSON (check console for raw output).");
+//         }
+
+//         if (!data.success) {
+//             historyList.innerHTML = '<p class="review-history__empty">Keine Bewertungen gefunden.</p>';
+//             return;
+//         }
+
+//         historyTotal = data.total;
+//         const valuations = data.valuations;
+
+//         if (!valuations || valuations.length === 0) {
+//             historyList.innerHTML = '<p class="review-history__empty">Keine Bewertungen gefunden.</p>';
+//             if (historyPagination) historyPagination.style.display = 'none';
+//             return;
+//         }
+
+//         renderHistoryCards(valuations);
+//         renderPagination();
+
+//     } catch (error) {
+//         console.error('History load error:', error);
+//         historyList.innerHTML = '<p class="review-history__empty">Fehler beim Laden. Bitte versuchen Sie es erneut.</p>';
+//     }
+// }
 async function loadHistory() {
     if (!historyList) return;
 
     historyList.innerHTML = '<p class="review-history__empty">Lade Bewertungen…</p>';
-
     const params = new URLSearchParams({
         search: historySearchTerm,
         page: historyPage,
@@ -631,6 +687,7 @@ async function loadHistory() {
         const response = await fetch(`/homes/list?${params.toString()}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
             },
         });
 
@@ -659,6 +716,7 @@ async function loadHistory() {
     }
 }
 
+// ===================================================================
 function renderHistoryCards(valuations) {
     if (!historyList) return;
 

@@ -288,6 +288,7 @@ class Homes extends \Core\Controller
         $propertyType       = $input['property_type'] ?? '';
         $area               = $input['area'] ?? 0;
         $plotAreaM2         = $input['plot_area_m2'] ?? 0;
+        $rooms              = $input['rooms'] ?? 0;
         $property_condition = $input['property_condition'] ?? '';
         $equipment          = $input['equipment'] ?? '';
         $microLocation      = $input['micro_location'] ?? 'standard';
@@ -295,7 +296,7 @@ class Homes extends \Core\Controller
         $residenceStatus   = $input['residence_status'] ?? 'erstwohnsitz';
 
         // Server-side validation
-        if (empty($plz) || empty($propertyType) || empty($area) || empty($property_condition) || empty($equipment)) {
+        if (empty($plz) || empty($propertyType) || empty($area) || empty($rooms) || empty($property_condition) || empty($equipment)) {
             http_response_code(400);
             echo json_encode(['error' => 'Ungültige PLZ oder fehlende Angaben']);
             exit;
@@ -313,6 +314,7 @@ class Homes extends \Core\Controller
             $propertyType,
             $area,
             $plotAreaM2,
+            $rooms,
             $property_condition,
             $equipment,
             $microLocation,

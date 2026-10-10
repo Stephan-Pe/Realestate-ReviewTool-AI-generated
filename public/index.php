@@ -142,11 +142,31 @@ $router->add('{controller}/{id:\d+}/{action}');
 
 // Admin Route
 $router->add('admin/{controller}/{action}', ['namespace' => 'Admin']);
+// error_log(
+//     'CSRF CHECK: ' .
+//         'session_id=' . session_id() .
+//         ' session_token=' . ($_SESSION['csrf_token'] ?? 'NOT SET') .
+//         ' header_token=' . ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? 'NOT SET')
+// );
 error_log(
-    'CSRF CHECK: ' .
-        'session_id=' . session_id() .
-        ' session_token=' . ($_SESSION['csrf_token'] ?? 'NOT SET') .
-        ' header_token=' . ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? 'NOT SET')
+    'ROUTE DEBUG: query=' .
+    ($_SERVER['QUERY_STRING'] ?? 'NOT SET')
+);
+
+error_log(
+    'ROUTE DEBUG: uri=' .
+    ($_SERVER['REQUEST_URI'] ?? 'NOT SET')
+);
+
+error_log(
+    'ROUTE DEBUG: homes/list=' .
+    ($router->getMatch('homes/list') ? 'MATCH' : 'NO MATCH')
+);
+$match = $router->getMatch('homes/list');
+
+error_log(
+    'ROUTE MATCH DETAILS: ' .
+    var_export($match, true)
 );
 
 // ===================================================================
@@ -205,33 +225,19 @@ $allowedRoutes = [
     'DELETE' => [],  // handled by catch-all {controller}/{id}/{action}
 ];
 
-// Normalize URL: strip leading slash, resolve empty to ''
+// Extract the route from the query string
 $rawUrl = $_GET['url'] ?? $_SERVER['QUERY_STRING'] ?? '';
-// $normalizedUrl = ltrim($rawUrl, '/');
-// if ($normalizedUrl === '') {
-//     $normalizedUrl = '';
-// }
 
-// Validate the URL against the allowed whitelist
+// Remove query parameters, keeping only the route
+$rawUrl = explode('&', $rawUrl, 2)[0];
+
+// Normalize leading and trailing slashes
+$rawUrl = trim($rawUrl, '/');
+
 $method = $_SERVER['REQUEST_METHOD'];
 $allowed = $allowedRoutes[$method] ?? $allowedRoutes['GET'];
 
-if (!in_array($rawUrl, $allowed)) {
-    // URL not in whitelist → reject immediately, no router execution
-    http_response_code(404);
-    header('Content-Type: text/html; charset=utf-8');
-    echo '404 — Not Found';
-    exit;
-}
-error_log('===== INDEX.PHP REACHED =====');
 
-error_log(sprintf(
-    'REQUEST: %s %s | HOST=%s | CONTENT_TYPE=%s',
-    $_SERVER['REQUEST_METHOD'] ?? '',
-    $_SERVER['REQUEST_URI'] ?? '',
-    $_SERVER['HTTP_HOST'] ?? '',
-    $_SERVER['CONTENT_TYPE'] ?? ''
-));
 
 // // Display the routing table
 // echo '<pre>';
@@ -242,5 +248,12 @@ error_log(sprintf(
 // var_dump($allowedRoutes);
 // echo '</pre>';
 
-// URL is whitelisted → safe to dispatch
+if (!in_array($rawUrl, $allowed, true)) {
+    http_response_code(404);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo '404 - Not Found';
+    exit;
+}
+
+// 3. Dispatch the validated route
 $router->dispatch($rawUrl);
