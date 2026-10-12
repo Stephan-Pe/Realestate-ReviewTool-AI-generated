@@ -51,6 +51,7 @@ class Homes extends \Core\Controller
     {
         $slides = Home::getsalesImagesForAdmin();
         $homes = Home::getAll();
+        $locations = Home::getAllLocations();
 
         // Check for calculation result stored in session (from form POST)
         $calcResult = null;
@@ -64,6 +65,7 @@ class Homes extends \Core\Controller
             'date' => $date,
             'slides' => $slides,
             'homes' => $homes,
+            'locations' => $locations,
             '_calc_result' => $calcResult,
         ]);
     }

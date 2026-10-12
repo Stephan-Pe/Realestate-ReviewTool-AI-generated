@@ -9,7 +9,8 @@
         <!-- Flash Messages -->
         {% for message in flash_messages %}
         <div class="review-flash review-flash--{{ message.type }}">
-            <i class="fas {{ message.type == 'success' ? 'fa-check-circle' : (message.type == 'warning' ? 'fa-exclamation-circle' : 'fa-info-circle') }}"></i>
+            <i
+                class="fas {{ message.type == 'success' ? 'fa-check-circle' : (message.type == 'warning' ? 'fa-exclamation-circle' : 'fa-info-circle') }}"></i>
             {{ message.text }}
         </div>
         {% endfor %}
@@ -19,16 +20,19 @@
         <div id="valuationResult" class="review-result" style="display:block;">
             <div class="review-result__header">
                 <h2><i class="fas fa-chart-line"></i> Bewertungsergebnis</h2>
-                <span id="resultLocation" class="review-result__location">{{ _calc_result.location_name }} ({{ _calc_result.plz }})</span>
+                <span id="resultLocation" class="review-result__location">{{ _calc_result.location_name }} ({{
+                    _calc_result.plz }})</span>
             </div>
             <div class="review-result__grid">
                 <div class="review-result__card">
                     <span class="review-result__card-label">Preis pro m²</span>
-                    <span class="review-result__card-value">{{ _calc_result.price_per_sqm|number_format(2, '.', ' ') }}&nbsp;CHF/m²</span>
+                    <span class="review-result__card-value">{{ _calc_result.price_per_sqm|number_format(2, '.', ' ')
+                        }}&nbsp;CHF/m²</span>
                 </div>
                 <div class="review-result__card review-result__card--highlight">
                     <span class="review-result__card-label">Geschätzter Marktwert</span>
-                    <span class="review-result__card-value">{{ _calc_result.total_value|number_format(2, '.', "'") }}&nbsp;CHF</span>
+                    <span class="review-result__card-value">{{ _calc_result.total_value|number_format(2, '.', "'")
+                        }}&nbsp;CHF</span>
                 </div>
                 <div class="review-result__card">
                     <span class="review-result__card-label">Bewertungsspanne</span>
@@ -72,7 +76,10 @@
         <!-- Hero -->
         <section class="review-hero">
             <h1 class="review-hero__title">🏠 Immobilien-Bewertungs-DemoTool</h1>
-            <p class="review-hero__subtitle">Wie wird der  Marktwert einer Wohnimmobilie in der Schweiz geschätzt — Fokus Kanton Graubünden</p><p class="review-hero__subtitle">KI generierte interactive Demoseite für Immobilienbewertung. Probieren Sie es aus!</p>
+            <p class="review-hero__subtitle">Wie wird der Marktwert einer Wohnimmobilie in der Schweiz geschätzt — Fokus
+                Kanton Graubünden</p>
+            <p class="review-hero__subtitle">KI generierte interactive Demoseite für Immobilienbewertung. Probieren Sie
+                es aus!</p>
         </section>
 
         <!-- Tabs -->
@@ -96,20 +103,13 @@
                             <i class="fas fa-map-marker-alt"></i> Postleitzahl
                         </label>
                         <div class="review-input-wrap">
-                            <input
-                                type="text"
-                                id="plz"
-                                name="plz"
-                                class="review-form__input"
-                                placeholder="PLZ eingeben (z.B. 7000)"
-                                autocomplete="off"
-                                required
-                            />
+                            <input type="text" id="plz" name="plz" class="review-form__input"
+                                placeholder="PLZ eingeben (z.B. 7000)" autocomplete="off" required />
                             <div id="plz-suggestions" class="plz-suggestions"></div>
                         </div>
                         <small id="plz-hint" class="review-form__hint"></small>
                     </div>
-                      {{ csrf_field() }}
+                    {{ csrf_field() }}
                     <!-- Property Type -->
                     <div class="review-form__field">
                         <label for="property_type" class="review-form__label">
@@ -131,16 +131,8 @@
                         <label for="area" class="review-form__label">
                             <i class="fas fa-ruler-combined"></i> Wohnfläche (m²)
                         </label>
-                        <input
-                            type="number"
-                            id="area"
-                            name="area"
-                            class="review-form__input"
-                            placeholder="z.B. 150"
-                            min="1"
-                            step="0.5"
-                            required
-                        />
+                        <input type="number" id="area" name="area" class="review-form__input" placeholder="z.B. 150"
+                            min="1" step="0.5" required />
                     </div>
 
                     <!-- Rooms -->
@@ -148,16 +140,8 @@
                         <label for="rooms" class="review-form__label">
                             <i class="fas fa-door-open"></i> Anzahl Zimmer
                         </label>
-                        <input
-                            type="number"
-                            id="rooms"
-                            name="rooms"
-                            class="review-form__input"
-                            placeholder="z.B. 4.5"
-                            min="1"
-                            step="0.5"
-                            required
-                        />
+                        <input type="number" id="rooms" name="rooms" class="review-form__input" placeholder="z.B. 4.5"
+                            min="1" step="0.5" required />
                     </div>
 
                     <!-- property_condition -->
@@ -196,8 +180,9 @@
                         </label>
                         <select id="residence_status" name="residence_status" class="review-form__select">
                             <option value="erstwohnsitz">Erstwohnsitz (Baseline 1.00)</option>
-                            <option value="zweitwohnsitz">Zweitwohnsitz (Standard, +18-25%)</option>
-                            <option value="zweitwohnsitz_privilegiert">Zweitwohnsitz (Privilegiert / Altrecht, +20-25%)</option>
+                            <option value="zweitwohnsitz">Zweitwohnsitz (Standard, +12-20%)</option>
+                            <option value="zweitwohnsitz_privilegiert">Zweitwohnsitz (Tourismusgebiet / Altrecht,
+                                +20-30%)</option>
                         </select>
                     </div>
 
@@ -206,15 +191,8 @@
                         <label for="plot_area_m2" class="review-form__label">
                             <i class="fas fa-vector-square"></i> Grundstücksfläche (m²)
                         </label>
-                        <input
-                            type="number"
-                            id="plot_area_m2"
-                            name="plot_area_m2"
-                            class="review-form__input"
-                            placeholder="z.B. 500"
-                            min="0"
-                            step="1"
-                        />
+                        <input type="number" id="plot_area_m2" name="plot_area_m2" class="review-form__input"
+                            placeholder="z.B. 500" min="0" step="1" />
                     </div>
 
                     <!-- Micro Location -->
@@ -246,7 +224,12 @@
                     <div class="review-form__field review-form__field--submit">
                         <div class="review-form__explanation">
                             <i class="fas fa-info-circle"></i>
-                            <span>Erstwohnsitz: nach 2012 gebaut, gesetzlich nur als Erstwohnsitz nutzbar. Feriendomizil: Wohnsitz ohne Auflagen, kann als Zweitwohnsitz genutzt werden. Erkundigen Sie sich bei Ihrem lokalen Bau- oder Grundbuchamt. Diese Schätzung basiert auf Richtwerten und dient nur als Anschauung des Bewertungsprozesses. Die Standortdaten können ungenau sein, da das Bewertungstool nur den Bewertungsprozess nachvollzieht und keine aktuellen, detailierten Daten liefert.</span>
+                            <span>Erstwohnsitz: nach 2012 gebaut, gesetzlich nur als Erstwohnsitz nutzbar.
+                                Feriendomizil: Wohnsitz ohne Auflagen, kann als Zweitwohnsitz genutzt werden. Erkundigen
+                                Sie sich bei Ihrem lokalen Bau- oder Grundbuchamt. Diese Schätzung basiert auf
+                                Richtwerten und dient nur als Anschauung des Bewertungsprozesses. Die Standortdaten
+                                können ungenau sein, da das Bewertungstool nur den Bewertungsprozess nachvollzieht und
+                                keine aktuellen, detailierten Daten liefert.</span>
                         </div>
                         <button type="submit" class="review-btn review-btn--primary" id="calcBtn">
                             <i class="fas fa-calculator"></i> Bewertung durchführen
@@ -358,7 +341,11 @@
 
                 <div class="review-result__disclaimer">
                     <i class="fas fa-info-circle"></i>
-                    <p>Diese Schätzung basiert auf Richtwerten und dient nur als Anschauung des Bewertungsprozesses. Die Standortdaten können ungenau sein, da das Bewertungstool nur den Bewertungsprozess nachvollzieht und keine aktuellen, detailierten Daten liefert. Für eine verbindliche Bewertung wenden Sie sich bitte an einen zertifizierten Gutachter. Wenn Sie Ihre Immobilie über uns verkaufen möchten, gehört die fachgerechte Bewertung zu unseren Leistungen. </p>
+                    <p>Diese Schätzung basiert auf Richtwerten und dient nur als Anschauung des Bewertungsprozesses. Die
+                        Standortdaten können ungenau sein, da das Bewertungstool nur den Bewertungsprozess nachvollzieht
+                        und keine aktuellen, detailierten Daten liefert. Für eine verbindliche Bewertung wenden Sie sich
+                        bitte an einen zertifizierten Gutachter. Wenn Sie Ihre Immobilie über uns verkaufen möchten,
+                        gehört die fachgerechte Bewertung zu unseren Leistungen. </p>
                 </div>
             </div>
         </div>
@@ -367,12 +354,8 @@
         <div class="review-panel" id="panel-history">
             <div class="review-history">
                 <div class="review-history__search">
-                    <input
-                        type="text"
-                        id="historySearch"
-                        class="review-form__input"
-                        placeholder="Suche nach PLZ, Ort oder Objektart…"
-                    />
+                    <input type="text" id="historySearch" class="review-form__input"
+                        placeholder="Suche nach PLZ, Ort oder Objektart…" />
                     <i class="fas fa-search"></i>
                 </div>
 
@@ -389,7 +372,29 @@
         </div>
 
     </div>
-  {% include('snippets/location-list.html') %}
+    {% if locations %}
+    <ul class="location-list">
+        <li class="location-list__title">Folgende Daten liegen unserer Liste zugrunde. Änderungsvorschläge sind
+            willkommen.</li>
+        <li class="location-list__header">
+            <span>PLZ</span>
+            <span>Ort</span>
+            <span>Bezirk/Region</span>
+            <span>Faktor</span>
+            <span>Land</span>
+        </li>
+
+        {% for location in locations %}
+        <li class="location-list__item">
+            <span class="location-list__zip">{{ location.plz }}</span>
+            <span class="location-list__name">{{ location.city }}</span>
+            <span class="location-list__region">{{ location.state }}</span>
+            <span class="location-list__factor">{{ location.macro_location_factor }}</span>
+            <span class="location-list__country">{{ location.country }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
 </main>
 {% endblock %}

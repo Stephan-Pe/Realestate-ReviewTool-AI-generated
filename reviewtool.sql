@@ -436,7 +436,7 @@ CREATE TABLE `residence_status_factors` (
 
 INSERT INTO `residence_status_factors` (`id`, `status`, `trend_threshold`, `factor`, `description`) VALUES
 (1, 'erstwohnsitz', 0.00, 1.000, 'Erstwohnsitz: Baseline (100% des Basiswerts)'),
-(2, 'zweitwohnsitz', 0.00, 1.180, 'Zweitwohnsitz: Standardgebiet (+18% wegen Knappheit)'),
+(2, 'zweitwohnsitz', 0.00, 1.120, 'Zweitwohnsitz: Standardgebiet (+12% wegen Knappheit)'),
 (3, 'zweitwohnsitz', 1.01, 1.250, 'Zweitwohnsitz: Begehrte Tourismusregion (+25% wegen Lex Weber Knappheit)'),
 (4, 'zweitwohnsitz_privilegiert', 0.00, 1.200, 'Privilegierte Zweitwohnung (Altrecht): Standardgebiet (+20%)'),
 (5, 'zweitwohnsitz_privilegiert', 1.01, 1.250, 'Privilegierte Zweitwohnung (Altrecht): Tourismusregion (+25%)'),

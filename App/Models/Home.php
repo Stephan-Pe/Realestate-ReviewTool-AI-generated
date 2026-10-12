@@ -110,7 +110,17 @@ class Home extends \Core\Model
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
+    /**
+     * Get all locations
+     *
+     * @return array
+     */
+    public static function getAllLocations(): array
+    {
+        $db = static::getDB();
+        $stmt = $db->query('SELECT * FROM locations ORDER BY plz ASC');
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     /**
      * Find a valuation by ID
      *
@@ -415,7 +425,7 @@ class Home extends \Core\Model
         // 'standard' is the baseline = 1.00 (no adjustment)
         $factors = [
             'luxus'    => 1.30,   // Luxury: +30% premium (high-end finishes, premium appliances)
-            'gehoben'  => 1.15,   // Premium: +15% (above-standard finishes)
+            'gehoben'  => 1.12,   // Premium: +15% (above-standard finishes)
             'standard' => 1.00,   // Standard: baseline (100% of base value)
             'einfach'  => 0.85,   // Basic: -15% (simple, functional finishes)
         ];
@@ -762,9 +772,9 @@ class Home extends \Core\Model
     {
         $factors = [
             'top'       => 1.25,
-            'good'      => 1.10,
-            'standard'  => 1.00,
-            'peripheral'=> 0.85,
+            'good'      => 1.00,
+            'standard'  => 0.85,
+            'peripheral'=> 0.75,
         ];
 
         // Normalize input to lowercase for case-insensitive matching
@@ -811,7 +821,7 @@ class Home extends \Core\Model
     {
         return [
             ['value' => 'erstwohnsitz', 'label' => 'Erstwohnsitz', 'factor' => 1.00],
-            ['value' => 'zweitwohnsitz', 'label' => 'Zweitwohnsitz (Standard)', 'factor' => 1.18],
+            ['value' => 'zweitwohnsitz', 'label' => 'Zweitwohnsitz (Standard)', 'factor' => 1.12],
             ['value' => 'zweitwohnsitz_privilegiert', 'label' => 'Zweitwohnsitz (Privilegiert / Altrecht)', 'factor' => 1.20]
         ];
     }
