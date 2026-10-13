@@ -318,3 +318,71 @@ In der Praxis gewichten die Schweizer Algorithmen die Preis Treiber in etwa wie 
 
 Wenn Sie den Quadratmeterpreis einer Schweizer Immobilie modellieren möchten, starten Sie immer mit dem **Median-Quadratmeterpreis der Gemeinde (Makro/Mikro-Basis)** und multiplizieren diesen sequenziell mit den prozentualen Zu- oder Abschlägen der Objektdetails (Grösse, Zimmerstruktur, Baujahr, Zustand und Sonderstatus wie Zweitwohnung).
 
+```json
+Calculation result displayed: 
+Object { plz: "7408", location_name: "Cazis", country: "CH", property_type: "Mehrfamilienhaus", area: 0, plot_area_m2: 1000, rooms: 0, property_condition: "sanierungsbedürftig", equipment: "einfach", micro_location: "standard", … }
+​
+anzahl_apartments: 3
+​
+area: 0
+​
+brutto_miete_monat: 3000
+​
+brutto_miete_pa: 36000
+​
+brutto_rendite_pct: 0
+​
+building_value: 0
+​
+condition_factor: 0.82
+​
+country: "CH"
+​
+development_potential: "none"
+​
+development_potential_factor: 1
+​
+development_value: 0
+​
+effective_location_factor: 0.935
+​
+equipment: "einfach"
+​
+equipment_factor: 0.85
+​
+ertragswert: 900000
+​
+location_factor: 1.1
+​
+location_name: "Cazis"
+​
+micro_location: "standard"
+​
+micro_location_factor: 0.85
+​
+mischwert_final: 675000
+​
+netto_miete_pa: 36000
+​
+plot_area_m2: 1000
+​
+plz: "7408"
+​
+price_per_sqm: 4887.71
+​
+property_condition: "sanierungsbedürftig"
+​
+property_type: "Mehrfamilienhaus"
+​
+residence_status: "zweitwohnsitz"
+​
+residence_status_factor: 1.25
+​
+rooms: 0
+​
+size_multiplier: 1
+​
+total_value: 0
+```
+
+

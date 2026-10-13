@@ -42,6 +42,7 @@ class Home extends \Core\Model
     public ?float $micro_location_factor = null;
     public ?float $condition_factor = null;
     public ?float $equipment_factor = null;
+    public ?float $property_condition_factor = null;
     public ?float $development_potential_factor = null;
     public ?string $created_at = null;
     public ?string $updated_at = null;
@@ -55,6 +56,23 @@ class Home extends \Core\Model
     public ?float $trend_factor = null;
     public ?float $trend_factor_2019 = null;
     public ?float $trend_factor_2020 = null;
+    // ---- Mehrfamilienhaus (Multi-Family House) specific fields ----
+    public ?int $anzahl_apartments = null;
+    public ?float $brutto_miete_monat = null;
+    public ?float $brutto_miete_pa = null;
+    public ?float $netto_miete_pa = null;
+    public ?float $ertragswert = null;
+    public ?float $mischwert_final = null;
+    public ?float $brutto_rendite_pct = null;
+    public ?float $kostenquote_pct = null;
+    public ?float $kostenquote_final = null;
+    public ?float $netto_rendite_pct = null;
+    public ?float $netto_miete_monat_final = null;
+    public ?float $netto_miete_pa_final = null;
+    public ?float $kapitalisierungs_satz_pct = null;
+    public ?float $kapitalisierungs_satz_final = null;
+    public ?float $kostenquote_kapitalisierung_pct = null;
+
     /**
      * Validation error messages
      * @var array
@@ -155,13 +173,17 @@ class Home extends \Core\Model
                  equipment, micro_location, development_potential, residence_status,
                  price_per_sqm, total_value, location_factor, micro_location_factor,
                  condition_factor, equipment_factor, residence_status_factor, rooms,
-                 development_potential_factor, created_at, updated_at)
+                 development_potential_factor, created_at, updated_at,
+                 anzahl_apartments, brutto_miete_monat, brutto_miete_pa, netto_miete_pa,
+                 ertragswert, mischwert_final, brutto_rendite_pct)
                 VALUES
                 (:plz, :location_name, :country, :property_type, :area, :plot_area_m2, :property_condition,
                  :equipment, :micro_location, :development_potential, :residence_status,
                  :price_per_sqm, :total_value, :location_factor, :micro_location_factor,
                  :condition_factor, :equipment_factor, :residence_status_factor, :rooms,
-                 :development_potential_factor, NOW(), NOW())';
+                 :development_potential_factor, NOW(), NOW(),
+                 :anzahl_apartments, :brutto_miete_monat, :brutto_miete_pa, :netto_miete_pa,
+                 :ertragswert, :mischwert_final, :brutto_rendite_pct)';
 
         $db = static::getDB();
         $stmt = $db->prepare($sql);
@@ -186,6 +208,14 @@ class Home extends \Core\Model
         $stmt->bindValue(':residence_status_factor', $this->residence_status_factor ?? 1.0, PDO::PARAM_STR);
         $stmt->bindValue(':development_potential_factor', $this->development_potential_factor ?? 1.0, PDO::PARAM_STR);
         $stmt->bindValue(':rooms', $this->rooms, PDO::PARAM_STR);
+        // Mehrfamilienhaus fields
+        $stmt->bindValue(':anzahl_apartments', $this->anzahl_apartments, PDO::PARAM_INT);
+        $stmt->bindValue(':brutto_miete_monat', $this->brutto_miete_monat, PDO::PARAM_STR);
+        $stmt->bindValue(':brutto_miete_pa', $this->brutto_miete_pa, PDO::PARAM_STR);
+        $stmt->bindValue(':netto_miete_pa', $this->netto_miete_pa, PDO::PARAM_STR);
+        $stmt->bindValue(':ertragswert', $this->ertragswert, PDO::PARAM_STR);
+        $stmt->bindValue(':mischwert_final', $this->mischwert_final, PDO::PARAM_STR);
+        $stmt->bindValue(':brutto_rendite_pct', $this->brutto_rendite_pct, PDO::PARAM_STR);
 
         $stmt->execute();
         return (int) $db->lastInsertId();
@@ -224,7 +254,14 @@ class Home extends \Core\Model
                     residence_status_factor = :residence_status_factor,
                     rooms = :rooms,
                     development_potential_factor = :development_potential_factor,
-                    updated_at = NOW()
+                    updated_at = NOW(),
+                    anzahl_apartments = :anzahl_apartments,
+                    brutto_miete_monat = :brutto_miete_monat,
+                    brutto_miete_pa = :brutto_miete_pa,
+                    netto_miete_pa = :netto_miete_pa,
+                    ertragswert = :ertragswert,
+                    mischwert_final = :mischwert_final,
+                    brutto_rendite_pct = :brutto_rendite_pct
                 WHERE id = :id';
 
         $db = static::getDB();
@@ -251,6 +288,14 @@ class Home extends \Core\Model
         $stmt->bindValue(':residence_status_factor', $this->residence_status_factor ?? 1.0, PDO::PARAM_STR);
         $stmt->bindValue(':development_potential_factor', $this->development_potential_factor ?? 1.0, PDO::PARAM_STR);
         $stmt->bindValue(':rooms', $this->rooms, PDO::PARAM_STR);
+        // Mehrfamilienhaus fields
+        $stmt->bindValue(':anzahl_apartments', $this->anzahl_apartments, PDO::PARAM_INT);
+        $stmt->bindValue(':brutto_miete_monat', $this->brutto_miete_monat, PDO::PARAM_STR);
+        $stmt->bindValue(':brutto_miete_pa', $this->brutto_miete_pa, PDO::PARAM_STR);
+        $stmt->bindValue(':netto_miete_pa', $this->netto_miete_pa, PDO::PARAM_STR);
+        $stmt->bindValue(':ertragswert', $this->ertragswert, PDO::PARAM_STR);
+        $stmt->bindValue(':mischwert_final', $this->mischwert_final, PDO::PARAM_STR);
+        $stmt->bindValue(':brutto_rendite_pct', $this->brutto_rendite_pct, PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -269,7 +314,7 @@ class Home extends \Core\Model
         return $stmt->execute();
     }
 
-    /**
+/**
      * Validate valuation data
      */
     public function validate(): void
@@ -280,9 +325,22 @@ class Home extends \Core\Model
         if (empty($this->property_type)) {
             $this->errors[] = 'Objektart ist erforderlich.';
         }
-        if (empty($this->area) || $this->area <= 0) {
-            $this->errors[] = 'Wohnfläche muss grösser als 0 sein.';
+
+        // Wohnfläche nur prüfen, WENN es kein Mehrfamilienhaus ist
+        if ($this->property_type !== 'Mehrfamilienhaus') {
+            if (empty($this->area) || $this->area <= 0) {
+                $this->errors[] = 'Wohnfläche muss grösser als 0 sein.';
+            }
+        } else {
+            // Optional: Spezifische Validierung für Mehrfamilienhaus
+            if (empty($this->anzahl_apartments) || $this->anzahl_apartments <= 0) {
+                $this->errors[] = 'Anzahl Wohnungen muss grösser als 0 sein.';
+            }
+            if (empty($this->brutto_miete_monat) || $this->brutto_miete_monat <= 0) {
+                $this->errors[] = 'Bruttomiete pro Monat ist erforderlich.';
+            }
         }
+
         if (empty($this->property_condition)) {
             $this->errors[] = 'Zustand ist erforderlich.';
         }
@@ -468,7 +526,7 @@ class Home extends \Core\Model
      * @param string $residenceStatus
      * @return array
      */
-/**
+    /**
      * Calculate a full valuation using the THREE-LAYER MODEL (per Refactoring.md).
      *
      * @param string $plz
@@ -493,8 +551,18 @@ class Home extends \Core\Model
         string $equipment,
         string $microLocation,
         string $developmentPotential,
-        string $residenceStatus = 'erstwohnsitz'
+        string $residenceStatus = 'erstwohnsitz',
+        ?int $anzahlApartments = null,
+        ?float $bruttoMieteMonat = null,
+        ?float $kostenquoteJahr = null
     ): array {
+        // Durchschnittliche Wohnfläche für Mehrfamilienhäuser setzen,
+        // wenn keine Wohnfläche angegeben wurde.
+        if (strtolower($propertyType) === 'mehrfamilienhaus' && $area <= 0) {
+            $averageAreaPerApartment = 70.0; // Durchschnitt: 70 m² pro Wohnung
+
+            $area = $averageAreaPerApartment * max(1, $anzahlApartments ?? 1);
+        }
         // Step 0: Look up location data from the 'locations' table by PLZ
         $location = static::getLocationByPLZ($plz);
 
@@ -508,7 +576,7 @@ class Home extends \Core\Model
         // Effective location factor = macro × micro
         $effectiveLocationFactor = $macroLocationFactor * $microLocationFactor;
 
-        $trendFactor = $macroLocationFactor; 
+        $trendFactor = $macroLocationFactor;
 
         // ---- LAYER 2: Property Characteristics ----
         $basePrice = static::getBasePrice($propertyType);
@@ -518,7 +586,13 @@ class Home extends \Core\Model
         $developmentFactor = static::getDevelopmentPotentialFactor($developmentPotential);
 
         // ** INTEGRATION: Size & Room Multiplier (Degression & Density) **
-        $sizeMultiplier = static::berechneGroessenMultiplikator($area, $zimmer);
+        // NOTE: For Mehrfamilienhaus, standard area/room inputs are bypassed per spec.
+        // Use sizeMultiplier = 1.0 (no adjustment) for MFH to avoid INF/NAN from pow(0, negative).
+        if (strtolower($propertyType) === 'mehrfamilienhaus') {
+            $sizeMultiplier = 1.0;
+        } else {
+            $sizeMultiplier = static::berechneGroessenMultiplikator($area, $zimmer);
+        }
 
         // Calculate price per m² (now including size/room scaling)
         $pricePerSqm = $basePrice
@@ -539,7 +613,7 @@ class Home extends \Core\Model
             * $conditionFactor
             * $equipmentFactor
             * $residenceFactor;
-            
+
         $buildingValue = $buildingValuePerSqm * $area;
         $developmentValue = $totalValue - $buildingValue;
 
@@ -547,8 +621,32 @@ class Home extends \Core\Model
         $locationName = is_array($location) ? ($location['city'] ?? 'Unbekannt') : 'Unbekannt';
         $country      = is_array($location) ? ($location['country'] ?? 'CH') : 'CH';
 
+        // ---- LAYER 3: Income Value Calculation for Mehrfamilienhaus ----
+        $mfhResult = null;
+        if (strtolower($propertyType) === 'mehrfamilienhaus') {
+
+            // Kapitalisierungssatz abhängig von der Anzahl Wohnungen
+            // Kapitalisierungssatz abhängig von der Anzahl Wohnungen
+            if ($anzahlApartments === null || $anzahlApartments <= 0) {
+                $kapitalisierungsSatz = 0.04; // Standardwert
+            } elseif ($anzahlApartments < 6) {
+                $kapitalisierungsSatz = 0.06; // 1–5 Wohnungen
+            } elseif ($anzahlApartments <= 10) {
+                $kapitalisierungsSatz = 0.05; // 6–10 Wohnungen
+            } else {
+                $kapitalisierungsSatz = 0.04; // Mehr als 10 Wohnungen
+            }
+
+            $mfhResult = static::calculateMfhValue(
+                marktwertCalculated: $totalValue,
+                bruttoMieteMonat: $bruttoMieteMonat ?? 0,
+                kostenquoteJahr: 0.20,
+                kapitalisierungsSatz: $kapitalisierungsSatz
+            );
+        }
+
         // Return all calculation results (added rooms & size_multiplier for tracking)
-        return [
+        $result = [
             'plz'                          => $plz,
             'location_name'                => $locationName,
             'country'                      => $country,
@@ -574,22 +672,90 @@ class Home extends \Core\Model
             'residence_status_factor'      => $residenceFactor,
             'development_potential_factor' => $developmentFactor,
         ];
+
+        // Add Mehrfamilienhaus-specific fields when applicable
+        if ($mfhResult !== null) {
+            $result['anzahl_apartments']  = $anzahlApartments ?? null;
+            $result['brutto_miete_monat'] = $bruttoMieteMonat ?? null;
+            $result['brutto_miete_pa']    = $mfhResult['brutto_miete_pa'];
+            $result['netto_miete_pa']     = $mfhResult['netto_miete_pa'];
+            $result['ertragswert']        = $mfhResult['ertragswert'];
+            $result['mischwert_final']    = $mfhResult['mischwert_final'];
+            $result['brutto_rendite_pct'] = $mfhResult['brutto_rendite_pct'];
+            $result['kostenquote_pct'] = $mfhResult['kostenquote_pct'];
+            $result['kapitalisierungs_satz_pct'] =
+                $mfhResult['kapitalisierungs_satz_pct'];
+        }
+
+        return $result;
     }
 
     /**
      * Helper method to compute the area and room count multiplier.
+     * Guard against zero/negative inputs that would cause pow(0, negative) = INF.
      */
-    protected static function berechneGroessenMultiplikator(float $wohnflaeche, float $zimmer): float {
+    protected static function berechneGroessenMultiplikator(float $wohnflaeche, float $zimmer): float
+    {
+        // Guard: return 1.0 (no adjustment) for zero or negative inputs
+        if ($wohnflaeche <= 0 || $zimmer <= 0) {
+            return 1.0;
+        }
+
         $basisFlaeche = 100.0;
-        $alpha = -0.18; 
+        $alpha = -0.18;
         $flaechenFaktor = pow($wohnflaeche / $basisFlaeche, $alpha);
 
         $erwarteteZimmer = max(1.0, $wohnflaeche / 28.0);
-        $beta = 0.08; 
+        $beta = 0.08;
         $zimmerFaktor = pow($zimmer / $erwarteteZimmer, $beta);
 
         return round($flaechenFaktor * $zimmerFaktor, 4);
     }
+    /**
+     * Berechnet den Ertragswert und den gewichteten Mischwert für ein MFH
+     * Calculates the income value and the weighted average value for a multi-family house
+     *
+     * @param float $marktwertCalculated Current market/substance value (in CHF)
+     * @param float $bruttoMieteMonat    Gross monthly rental income (in CHF)
+     * @param float $kostenquoteJahr     Maintenance & management cost ratio (default: 0.20 = 20%)
+     * @param float $kapitalisierungsSatz Capitalization rate / Cap rate (default: 0.040 = 4.0%)
+     * @param float $gewichtungErtrag    Weighting factor for yield value vs substance value (default: 0.75 = 75%)
+     * @return array
+     */
+    public static function calculateMfhValue(
+        float $marktwertCalculated,
+        float $bruttoMieteMonat,
+        float $kostenquoteJahr = 0.20,
+        float $kapitalisierungsSatz = 0.040,
+        float $gewichtungErtrag = 0.75
+    ): array {
+        // 1. Calculate annual gross and net rental income
+        $bruttoMietePa = $bruttoMieteMonat * 12;
+        $nettoMietePa  = $bruttoMietePa * (1.0 - $kostenquoteJahr);
+
+        // 2. Determine Income Value (Ertragswert = Net Annual Rent / Cap Rate)
+        // Guard against division by zero for cap rate
+        $ertragswert = ($kapitalisierungsSatz > 0) ? ($nettoMietePa / $kapitalisierungsSatz) : 0.0;
+
+        // 3. Calculate Weighted Average Market Value (Mischwert)
+        $gewichtungMarktwert = 1.0 - $gewichtungErtrag;
+        $mischwert = ($ertragswert * $gewichtungErtrag) + ($marktwertCalculated * $gewichtungMarktwert);
+
+        // 4. Calculate Key Indicators
+        // Guard against division by zero for market value
+        $bruttoRendite = ($marktwertCalculated > 0) ? (($bruttoMietePa / $marktwertCalculated) * 100) : 0.0;
+
+        return [
+            'brutto_miete_pa'         => round($bruttoMietePa, 2),
+            'netto_miete_pa'          => round($nettoMietePa, 2),
+            'ertragswert'             => round($ertragswert, 2),
+            'mischwert_final'         => round($mischwert, 2),
+            'brutto_rendite_pct'      => round($bruttoRendite, 2),
+            'kostenquote_pct'         => round($kostenquoteJahr * 100, 2),
+            'kapitalisierungs_satz_pct' => round($kapitalisierungsSatz * 100, 2),
+        ];
+    }
+
     /**
      * Get sales images for admin (stub — review tool only)
      *
@@ -774,7 +940,7 @@ class Home extends \Core\Model
             'top'       => 1.25,
             'good'      => 1.00,
             'standard'  => 0.85,
-            'peripheral'=> 0.75,
+            'peripheral' => 0.75,
         ];
 
         // Normalize input to lowercase for case-insensitive matching

@@ -77,6 +77,15 @@ const saveResidenceFactor = document.getElementById('save_residence_status_facto
 const saveDevelopmentFactor = document.getElementById('save_development_potential_factor');
 const saveCountry = document.getElementById('save_country');
 
+const saveAnzahlApartments = document.getElementById('save_anzahl_apartments');
+const saveBruttoMieteMonat = document.getElementById('save_brutto_miete_monat');
+const saveBruttoMietePa = document.getElementById('save_brutto_miete_pa');
+const saveNettoMietePa = document.getElementById('save_netto_miete_pa');
+const saveErtragswert = document.getElementById('save_ertragswert');
+// const saveMischwertFinal = document.getElementById('save_mischwert_final');
+// const saveBruttoRenditePct = document.getElementById('save_brutto_rendite_pct');
+// const saveErtragswertFinalPa = document.getElementById('save_ertragswert_final_pa');
+
 // ===================================================================
 //  State
 // ===================================================================
@@ -303,8 +312,6 @@ async function performCalculation() {
     // Gather form inputs
     const plz = plzInput?.value.trim();
     const propertyType = document.getElementById('property_type')?.value;
-    const area = document.getElementById('area')?.value;
-    const rooms = document.getElementById('rooms')?.value;
     const plotAreaM2 = document.getElementById('plot_area_m2')?.value || 0;
     const property_condition = document.getElementById('property_condition')?.value;
     const equipment = document.getElementById('equipment')?.value;
@@ -313,9 +320,25 @@ async function performCalculation() {
     const residenceStatus = document.getElementById('residence_status')?.value || 'erstwohnsitz';
 
     // Validate that all required fields are filled
-    if (!plz || !propertyType || !area || !rooms || !property_condition || !equipment) {
+    if (!plz || !propertyType || !property_condition || !equipment) {
         showFlash('Bitte füllen Sie alle Felder aus.', 'warning');
         return;
+    }
+
+    // Collect property-type-specific fields
+    let area, rooms, anzahlApartments, bruttoMieteMonat;
+    if (propertyType === 'Mehrfamilienhaus') {
+        // For Mehrfamilienhaus: collect MFH-specific fields
+        anzahlApartments = document.getElementById('anzahl_apartments')?.value || null;
+        bruttoMieteMonat = document.getElementById('brutto_miete_monat')?.value || null;
+    } else {
+        // For other property types: collect standard fields
+        area = document.getElementById('area')?.value;
+        rooms = document.getElementById('rooms')?.value;
+        if (!area || !rooms) {
+            showFlash('Bitte füllen Sie alle Felder aus.', 'warning');
+            return;
+        }
     }
 
     // Show loading spinner, hide previous results
@@ -333,8 +356,10 @@ async function performCalculation() {
             body: JSON.stringify({
                 plz: plz,
                 property_type: propertyType,
-                area: parseFloat(area),
-                rooms: parseFloat(rooms),
+                area: area ? parseFloat(area) : null,
+                rooms: rooms ? parseFloat(rooms) : null,
+                anzahl_apartments: anzahlApartments ? parseInt(anzahlApartments) : null,
+                brutto_miete_monat: bruttoMieteMonat ? parseFloat(bruttoMieteMonat) : null,
                 plot_area_m2: parseFloat(plotAreaM2),
                 property_condition: property_condition,
                 equipment: equipment,
@@ -404,8 +429,8 @@ function displayResult(data) {
     // ---- Display value range (±10% uncertainty band) ----
     // Shows the estimated range: 90% to 110% of the calculated value
     if (resultRange) {
-        const low = data.total_value * 0.9;
-        const high = data.total_value * 1.1;
+        const low = data.total_value * 0.85;
+        const high = data.total_value * 1.15;
         resultRange.textContent = `${formatCurrency(low)} – ${formatCurrency(high)} CHF`;
     }
 
@@ -435,6 +460,34 @@ function displayResult(data) {
     const resultDevValue = document.getElementById('resultDevValue');
     if (resultDevValue) resultDevValue.textContent = formatCurrency(data.development_value || 0, 'CHF');
 
+    // ---- Display MFH-specific Ertragswert breakdown (only for Mehrfamilienhaus) ----
+    if (data.property_type === 'Mehrfamilienhaus' && data.ertragswert !== undefined) {
+        const mfhBreakdown = document.getElementById('mfhBreakdown');
+        if (mfhBreakdown) mfhBreakdown.style.display = 'block';
+
+        const resultAnzahlApartments = document.getElementById('resultAnzahlApartments');
+        if (resultAnzahlApartments) resultAnzahlApartments.textContent = data.anzahl_apartments ?? '—';
+
+        const resultBruttoMietePa = document.getElementById('resultBruttoMietePa');
+        if (resultBruttoMietePa) resultBruttoMietePa.textContent = formatCurrency(data.brutto_miete_pa, 'CHF');
+
+        const resultNettoMietePa = document.getElementById('resultNettoMietePa');
+        if (resultNettoMietePa) resultNettoMietePa.textContent = formatCurrency(data.netto_miete_pa, 'CHF');
+
+        const resultErtragswert = document.getElementById('resultErtragswert');
+        if (resultErtragswert) resultErtragswert.textContent = formatCurrency(data.ertragswert, 'CHF');
+
+        const resultMischwertFinal = document.getElementById('resultMischwertFinal');
+        if (resultMischwertFinal) resultMischwertFinal.textContent = formatCurrency(data.mischwert_final, 'CHF');
+
+        const resultBruttoRenditePct = document.getElementById('resultBruttoRenditePct');
+        if (resultBruttoRenditePct) resultBruttoRenditePct.textContent = (data.brutto_rendite_pct ?? '—') + '%';
+    } else {
+        // Hide MFH breakdown for non-MFH property types
+        const mfhBreakdown = document.getElementById('mfhBreakdown');
+        if (mfhBreakdown) mfhBreakdown.style.display = 'none';
+    }
+
     // Show result panel
     valuationResult.style.display = 'block';
 console.log('Calculation result displayed:', data);
@@ -462,6 +515,15 @@ console.log('Calculation result displayed:', data);
     if (saveDevelopmentFactor) saveDevelopmentFactor.value = data.development_potential_factor || 1.0;
     if (saveCountry) saveCountry.value = data.country || 'CH';
 
+    // ---- Populate hidden save-form fields for MFH-specific values ----
+    if (saveAnzahlApartments) saveAnzahlApartments.value = data.anzahl_apartments ?? '';
+    if (saveBruttoMieteMonat) saveBruttoMieteMonat.value = data.brutto_miete_monat ?? '';
+    if (saveBruttoMietePa) saveBruttoMietePa.value = data.brutto_miete_pa ?? '';
+    if (saveNettoMietePa) saveNettoMietePa.value = data.netto_miete_pa ?? '';
+    if (saveErtragswert) saveErtragswert.value = data.ertragswert ?? '';
+    // if (saveMischwertFinal) saveMischwertFinal.value = data.mischwert_final ?? '';
+    // if (saveBruttoRenditePct) saveBruttoRenditePct.value = data.brutto_rendite_pct ?? '';
+
     // Scroll to result
     valuationResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -484,24 +546,29 @@ function resetForm() {
  * Show/hide plot area and development potential fields based on property type.
  * These fields are only relevant for building types (Einfamilienhaus, Mehrfamilienhaus, etc.).
  * For apartments (Wohnung) and land (Grundstück), they don't apply.
+ *
+ * For 'Mehrfamilienhaus' specifically:
+ *   - SHOW: anzahl_apartments (Anzahl Wohnungen), brutto_miete_monat (Bruttomiete pro Monat)
+ *   - HIDE: area (Wohnfläche), rooms (Anzahl Zimmer)
  */
 function updatePropertyTypeFields() {
     const propertyTypeSelect = document.getElementById('property_type');
     if (!propertyTypeSelect) return;
 
     const propertyType = propertyTypeSelect.value;
+    const isMehrfamilienhaus = propertyType === 'Mehrfamilienhaus';
     
     // Building types that need plot area and development potential
     const buildingTypes = ['Einfamilienhaus', 'Mehrfamilienhaus', 'Reihenhaus', 'Doppelhaus'];
     const needsPlotArea = buildingTypes.includes(propertyType);
 
-    // Show/hide plot area field
+    // ---- Show/hide plot area field ----
     const plotAreaField = document.getElementById('plot_area_m2')?.closest('.review-form__field');
     if (plotAreaField) {
         plotAreaField.style.display = needsPlotArea ? 'block' : 'none';
     }
 
-    // Show/hide development potential field
+    // ---- Show/hide development potential field ----
     const devPotentialField = document.getElementById('development_potential')?.closest('.review-form__field');
     if (devPotentialField) {
         devPotentialField.style.display = needsPlotArea ? 'block' : 'none';
@@ -513,6 +580,34 @@ function updatePropertyTypeFields() {
         if (plotAreaInput) plotAreaInput.value = '';
         const devPotentialSelect = document.getElementById('development_potential');
         if (devPotentialSelect) devPotentialSelect.value = 'none';
+    }
+
+    // ---- Mehrfamilienhaus-specific field toggling ----
+    // Toggle MFH-only fields (show only for Mehrfamilienhaus)
+    const mfhFields = document.querySelectorAll('.mfh-only-field');
+    mfhFields.forEach(field => {
+        field.style.display = isMehrfamilienhaus ? 'block' : 'none';
+    });
+
+    // Toggle standard fields (hide for Mehrfamilienhaus)
+    const standardFields = document.querySelectorAll('.standard-property-field');
+    standardFields.forEach(field => {
+        field.style.display = isMehrfamilienhaus ? 'none' : 'block';
+    });
+
+    // Clear/reset values when switching property types
+    if (isMehrfamilienhaus) {
+        // Clear standard fields when switching to MFH
+        const areaInput = document.getElementById('area');
+        if (areaInput) areaInput.value = '';
+        const roomsInput = document.getElementById('rooms');
+        if (roomsInput) roomsInput.value = '';
+    } else {
+        // Clear MFH fields when switching away from MFH
+        const anzahlApartmentsInput = document.getElementById('anzahl_apartments');
+        if (anzahlApartmentsInput) anzahlApartmentsInput.value = '';
+        const bruttoMieteInput = document.getElementById('brutto_miete_monat');
+        if (bruttoMieteInput) bruttoMieteInput.value = '';
     }
 }
 
@@ -848,6 +943,15 @@ async function editValuation(valuation) {
 
     const residenceStatusSelect = document.getElementById('residence_status');
     if (residenceStatusSelect) residenceStatusSelect.value = valuation.residence_status || 'erstwohnsitz';
+
+    // ---- Restore MFH-specific fields when editing a Mehrfamilienhaus valuation ----
+    if (valuation.property_type === 'Mehrfamilienhaus') {
+        const anzahlApartmentsInput = document.getElementById('anzahl_apartments');
+        if (anzahlApartmentsInput) anzahlApartmentsInput.value = valuation.anzahl_apartments ?? '';
+
+        const bruttoMieteMonatInput = document.getElementById('brutto_miete_monat');
+        if (bruttoMieteMonatInput) bruttoMieteMonatInput.value = valuation.brutto_miete_monat ?? '';
+    }
 
     // Show/hide plot area and development potential fields based on property type
     updatePropertyTypeFields();

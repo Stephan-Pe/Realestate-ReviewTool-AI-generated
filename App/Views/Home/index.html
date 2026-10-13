@@ -126,8 +126,8 @@
                         </select>
                     </div>
 
-                    <!-- Area -->
-                    <div class="review-form__field">
+                    <!-- Area (hidden for Mehrfamilienhaus) -->
+                    <div class="review-form__field standard-property-field">
                         <label for="area" class="review-form__label">
                             <i class="fas fa-ruler-combined"></i> Wohnfläche (m²)
                         </label>
@@ -135,13 +135,31 @@
                             min="1" step="0.5" required />
                     </div>
 
-                    <!-- Rooms -->
-                    <div class="review-form__field">
+                    <!-- Rooms (hidden for Mehrfamilienhaus) -->
+                    <div class="review-form__field standard-property-field">
                         <label for="rooms" class="review-form__label">
                             <i class="fas fa-door-open"></i> Anzahl Zimmer
                         </label>
                         <input type="number" id="rooms" name="rooms" class="review-form__input" placeholder="z.B. 4.5"
                             min="1" step="0.5" required />
+                    </div>
+
+                    <!-- Mehrfamilienhaus: Anzahl Apartments (shown ONLY for Mehrfamilienhaus) -->
+                    <div class="review-form__field mfh-only-field" style="display:none;">
+                        <label for="anzahl_apartments" class="review-form__label">
+                            <i class="fas fa-building"></i> Anzahl Wohnungen
+                        </label>
+                        <input type="number" id="anzahl_apartments" name="anzahl_apartments" class="review-form__input"
+                            placeholder="z.B. 8" min="1" step="1" />
+                    </div>
+
+                    <!-- Mehrfamilienhaus: Bruttomiete pro Monat (shown ONLY for Mehrfamilienhaus) -->
+                    <div class="review-form__field mfh-only-field" style="display:none;">
+                        <label for="brutto_miete_monat" class="review-form__label">
+                            <i class="fas fa-money-bill-wave"></i> Bruttomiete pro Monat (CHF)
+                        </label>
+                        <input type="number" id="brutto_miete_monat" name="brutto_miete_monat" class="review-form__input"
+                            placeholder="z.B. 8000" min="0" step="1" />
                     </div>
 
                     <!-- property_condition -->
@@ -151,11 +169,11 @@
                         </label>
                         <select id="property_condition" name="property_condition" class="review-form__select" required>
                             <option value="">Bitte wählen</option>
-                            <option value="neuwertig">Neuwertig</option>
-                            <option value="renoviert">Renoviert</option>
-                            <option value="gepflegt">Gepflegt</option>
+                            <option value="neuwertig">Sehr gut / neuwertig</option>
+                            <option value="renoviert">Gut / gepflegt</option>
+                            <option value="gepflegt">Renovierungsbedürftig</option>
                             <option value="sanierungsbedürftig">Sanierungsbedürftig</option>
-                            <option value="renierungsbedürftig">Renovierungsbedürftig</option>
+                            <option value="renierungsbedürftig">Stark sanierungsbedürftig</option>
                         </select>
                     </div>
 
@@ -305,6 +323,31 @@
                         <span id="resultDevValue"></span>
                     </div>
                 </div>
+
+                <!-- Mehrfamilienhaus Ertragswert breakdown (shown ONLY for MFH) -->
+                <div class="review-result__mfh-breakdown" id="mfhBreakdown" style="display:none;">
+                    <h3><i class="fas fa-calculator"></i> Ertragswertberechnung (Mehrfamilienhaus)</h3>
+                    <div class="review-result__factor-row">
+                        <span>Anzahl Wohnungen:</span>
+                        <span id="resultAnzahlApartments"></span>
+                    </div>
+                    <div class="review-result__factor-row">
+                        <span>Bruttomiete p.a.:</span>
+                        <span id="resultBruttoMietePa"></span>
+                    </div>
+                    <div class="review-result__factor-row">
+                        <span>Nettomiete p.a.:</span>
+                        <span id="resultNettoMietePa"></span>
+                    </div>
+                    <div class="review-result__factor-row">
+                        <span>Ertragswert:</span>
+                        <span id="resultErtragswert" class="review-result__card-value"></span>
+                    </div>
+                    <div class="review-result__factor-row review-result__factor-row--highlight">
+                        <span>Gewichteter Mischwert:</span>
+                        <span id="resultMischwertFinal" class="review-result__card-value"></span>
+                    </div>
+                </div>
                 {{ csrf_field() }}
                 <div class="review-result__actions">
                     <button type="submit" class="review-btn review-btn--secondary" id="btnSave">
@@ -325,6 +368,14 @@
                     <input type="hidden" name="plot_area_m2" id="save_plot_area_m2" />
                     <input type="hidden" name="property_condition" id="save_property_condition" />
                     <input type="hidden" name="equipment" id="save_equipment" />
+                    <!-- Mehrfamilienhaus hidden fields -->
+                    <input type="hidden" name="anzahl_apartments" id="save_anzahl_apartments" />
+                    <input type="hidden" name="brutto_miete_monat" id="save_brutto_miete_monat" />
+                    <input type="hidden" name="brutto_miete_pa" id="save_brutto_miete_pa" />
+                    <input type="hidden" name="netto_miete_pa" id="save_netto_miete_pa" />
+                    <input type="hidden" name="ertragswert" id="save_ertragswert" />
+                    <input type="hidden" name="mischwert_final" id="save_mischwert_final" />
+                    <input type="hidden" name="brutto_rendite_pct" id="save_brutto_rendite_pct" />
                     <input type="hidden" name="micro_location" id="save_micro_location" />
                     <input type="hidden" name="development_potential" id="save_development_potential" />
                     <input type="hidden" name="residence_status" id="save_residence_status" />

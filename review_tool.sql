@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 06, 2026 at 07:10 PM
+-- Generation Time: Oct 13, 2026 at 06:45 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `reviewtool`
+-- Database: `review_tool`
 --
 
 -- --------------------------------------------------------
@@ -42,11 +42,11 @@ CREATE TABLE `base_prices` (
 --
 
 INSERT INTO `base_prices` (`id`, `property_type`, `base_price_per_sqm`, `currency`, `unit`, `created_at`, `updated_at`) VALUES
-(1, 'Einfamilienhaus', 8188.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(2, 'Mehrfamilienhaus', 6800.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-06 16:15:25'),
-(3, 'Wohnung', 8900.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-06 16:14:18'),
-(4, 'Reihenhaus', 7700.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-06 16:14:38'),
-(5, 'Doppelhaus', 7950.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-06 16:14:53'),
+(1, 'Einfamilienhaus', 7188.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-12 14:13:21'),
+(2, 'Mehrfamilienhaus', 6000.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-12 14:15:52'),
+(3, 'Wohnung', 7000.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-12 14:13:13'),
+(4, 'Reihenhaus', 6700.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-12 14:13:32'),
+(5, 'Doppelhaus', 6850.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-12 14:13:55'),
 (6, 'Grundstück', 1000.00, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (7, 'Landwirtschaftlich', 0.10, 'CHF', 'm²', '2026-10-06 14:01:39', '2026-10-06 14:01:39');
 
@@ -73,8 +73,8 @@ INSERT INTO `condition_factors` (`id`, `property_condition`, `factor`, `descript
 (1, 'neuwertig', 1.15, 'Neuwertig', '2026-10-06 14:01:39', '2026-10-06 15:15:23'),
 (2, 'renoviert', 1.08, 'Renoviert', '2026-10-06 14:01:39', '2026-10-06 15:15:15'),
 (3, 'gepflegt', 1.00, 'Gepflegt', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(4, 'sanierungsbedürftig', 0.82, 'Sanierungsbedürftig', '2026-10-06 14:01:39', '2026-10-06 15:15:30'),
-(5, 'renierungsbedürftig', 0.68, 'Renierungsbedürftig', '2026-10-06 14:01:39', '2026-10-06 15:15:38');
+(4, 'sanierungsbedürftig', 0.68, 'Sanierungsbedürftig', '2026-10-06 14:01:39', '2026-10-13 15:37:06'),
+(5, 'renierungsbedürftig', 0.57, 'Renierungsbedürftig', '2026-10-06 14:01:39', '2026-10-13 15:36:55');
 
 -- --------------------------------------------------------
 
@@ -145,8 +145,8 @@ CREATE TABLE `locations` (
 --
 
 INSERT INTO `locations` (`id`, `plz`, `city`, `state`, `macro_location_factor`, `country`, `created_at`, `updated_at`) VALUES
-(1, '6534', 'San Vittore', 'Moësa', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(2, '6535', 'Roveredo (GR)', 'Moësa', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
+(1, '6534', 'San Vittore', 'Moësa', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
+(2, '6535', 'Roveredo (GR)', 'Moësa', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
 (3, '6537', 'Grono', 'Moësa', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (4, '6538', 'Grono', 'Moësa', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (5, '6540', 'Castaneda', 'Moësa', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
@@ -167,11 +167,11 @@ INSERT INTO `locations` (`id`, `plz`, `city`, `state`, `macro_location_factor`, 
 (20, '7000', 'Chur', 'Plessur', 1.12, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (21, '7023', 'Haldenstein', 'Plessur', 0.98, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (22, '7026', 'Maladers', 'Plessur', 0.92, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
-(23, '7027', 'Calfreisen', 'Plessur', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(24, '7028', 'Pagig', 'Plessur', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(25, '7029', 'Peist', 'Plessur', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(26, '7031', 'Laax', 'Surselva', 1.08, 'CH', '2026-10-06 14:01:39', '2026-10-06 17:09:19'),
-(27, '7032', 'Laax', 'Surselva', 1.08, 'CH', '2026-10-06 14:01:39', '2026-10-06 17:09:19'),
+(23, '7027', 'Calfreisen', 'Plessur', 0.95, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
+(24, '7028', 'Pagig', 'Plessur', 0.95, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
+(25, '7029', 'Peist', 'Plessur', 0.95, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
+(26, '7031', 'Laax', 'Surselva', 1.35, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
+(27, '7032', 'Laax', 'Surselva', 1.35, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
 (28, '7050', 'Arosa', 'Plessur', 1.47, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (29, '7056', 'Molinis', 'Plessur', 0.95, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (30, '7057', 'Langwies', 'Plessur', 0.95, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
@@ -212,13 +212,13 @@ INSERT INTO `locations` (`id`, `plz`, `city`, `state`, `macro_location_factor`, 
 (65, '7128', 'Riein', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (66, '7130', 'Ilanz', 'Surselva', 0.95, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (67, '7132', 'Vals', 'Surselva', 1.02, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
-(68, '7134', 'Obersaxen', 'Surselva', 0.92, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
+(68, '7134', 'Obersaxen', 'Surselva', 1.15, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
 (69, '7137', 'Flond', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (70, '7138', 'Surcuolm', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (71, '7141', 'Luven', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (72, '7142', 'Cumbel', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (73, '7143', 'Morissen', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(74, '7144', 'Vella', 'Surselva', 0.90, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
+(74, '7144', 'Vella', 'Surselva', 1.15, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
 (75, '7145', 'Degen', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (76, '7146', 'Vattiz', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (77, '7147', 'Vignogn', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
@@ -245,14 +245,14 @@ INSERT INTO `locations` (`id`, `plz`, `city`, `state`, `macro_location_factor`, 
 (98, '7174', 'S.Benedetg', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (99, '7175', 'Sumvitg', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (100, '7176', 'Cumpadials', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(101, '7180', 'Disentis/Mustér', 'Surselva', 0.92, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
+(101, '7180', 'Disentis/Mustér', 'Surselva', 1.12, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
 (102, '7182', 'Cavardiras', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (103, '7183', 'Mompé Medel', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (104, '7184', 'Curaglia', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (105, '7185', 'Platta', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (106, '7186', 'Mompé Tujetsch', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (107, '7187', 'Camischolas', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(108, '7188', 'Sedrun', 'Surselva', 0.95, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
+(108, '7188', 'Sedrun', 'Surselva', 1.20, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
 (109, '7189', 'Rueras', 'Surselva', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (110, '7202', 'Says', 'Landquart', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (111, '7203', 'Trimmis', 'Landquart', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
@@ -283,11 +283,11 @@ INSERT INTO `locations` (`id`, `plz`, `city`, `state`, `macro_location_factor`, 
 (136, '7246', 'St.Antönien', 'Prättigau/Davos', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (137, '7247', 'Saas im Prättigau', 'Prättigau/Davos', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (138, '7249', 'Serneus', 'Prättigau/Davos', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(139, '7250', 'Klosters', 'Prättigau/Davos', 1.50, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
+(139, '7250', 'Klosters', 'Prättigau/Davos', 1.55, 'CH', '2026-10-06 14:01:39', '2026-10-08 14:09:19'),
 (140, '7252', 'Klosters Dorf', 'Prättigau/Davos', 1.45, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
-(141, '7260', 'Davos Dorf', 'Prättigau/Davos', 1.73, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
+(141, '7260', 'Davos Dorf', 'Prättigau/Davos', 1.60, 'CH', '2026-10-06 14:01:39', '2026-10-08 14:09:19'),
 (142, '7265', 'Davos Wolfgang', 'Prättigau/Davos', 1.45, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
-(143, '7270', 'Davos Platz', 'Prättigau/Davos', 1.65, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
+(143, '7270', 'Davos Platz', 'Prättigau/Davos', 1.55, 'CH', '2026-10-06 14:01:39', '2026-10-08 14:09:19'),
 (144, '7272', 'Davos Clavadel', 'Prättigau/Davos', 1.40, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (145, '7276', 'Davos Frauenkirch', 'Prättigau/Davos', 1.38, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (146, '7277', 'Davos Glaris', 'Prättigau/Davos', 1.30, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
@@ -344,10 +344,10 @@ INSERT INTO `locations` (`id`, `plz`, `city`, `state`, `macro_location_factor`, 
 (197, '7454', 'Rona', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (198, '7455', 'Mulegns', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (199, '7456', 'Sur', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(200, '7457', 'Bivio', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
+(200, '7457', 'Bivio', 'Albula', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
 (201, '7458', 'Mon', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (202, '7459', 'Stierva', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(203, '7460', 'Savognin', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
+(203, '7460', 'Savognin', 'Albula', 1.18, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
 (204, '7462', 'Salouf', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (205, '7463', 'Riom', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (206, '7464', 'Parsonz', 'Albula', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
@@ -361,10 +361,10 @@ INSERT INTO `locations` (`id`, `plz`, `city`, `state`, `macro_location_factor`, 
 (214, '7494', 'Wiesen', 'Albula', 1.20, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (215, '7500', 'St. Moritz', 'Maloja', 2.35, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (216, '7502', 'Bever', 'Maloja', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(217, '7503', 'Samedan', 'Maloja', 1.87, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
-(218, '7504', 'Pontresina', 'Maloja', 1.82, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
+(217, '7503', 'Samedan', 'Maloja', 1.77, 'CH', '2026-10-06 14:01:39', '2026-10-08 14:09:19'),
+(218, '7504', 'Pontresina', 'Maloja', 1.72, 'CH', '2026-10-06 14:01:39', '2026-10-08 14:09:19'),
 (219, '7505', 'Celerina/Schlarigna', 'Maloja', 1.70, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
-(220, '7512', 'Champfèr', 'Maloja', 2.05, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
+(220, '7512', 'Champfèr', 'Maloja', 1.50, 'CH', '2026-10-06 14:01:39', '2026-10-08 14:09:19'),
 (221, '7513', 'Silvaplana', 'Maloja', 1.85, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (222, '7514', 'Sils/Segl Maria', 'Maloja', 1.72, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
 (223, '7515', 'Sils/Segl Baselgia', 'Maloja', 1.65, 'CH', '2026-10-06 14:01:39', '2026-10-06 15:08:28'),
@@ -407,10 +407,10 @@ INSERT INTO `locations` (`id`, `plz`, `city`, `state`, `macro_location_factor`, 
 (260, '7608', 'Castasegna', 'Maloja', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (261, '7610', 'Soglio', 'Maloja', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (262, '7710', 'Ospizio Bernina', 'Bernina', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(263, '7741', 'S. Carlo (Poschiavo)', 'Bernina', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(264, '7742', 'Poschiavo', 'Bernina', 1.10, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(265, '7743', 'Brusio', 'Bernina', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
-(266, '7744', 'Campocologno', 'Bernina', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
+(263, '7741', 'S. Carlo (Poschiavo)', 'Bernina', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
+(264, '7742', 'Poschiavo', 'Bernina', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
+(265, '7743', 'Brusio', 'Bernina', 0.95, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
+(266, '7744', 'Campocologno', 'Bernina', 0.95, 'CH', '2026-10-06 14:01:39', '2026-10-12 13:26:37'),
 (267, '7745', 'Li Curt', 'Bernina', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (268, '7746', 'Le Prese', 'Bernina', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
 (269, '7747', 'Viano', 'Bernina', 1.00, 'CH', '2026-10-06 14:01:39', '2026-10-06 14:01:39'),
@@ -436,7 +436,7 @@ CREATE TABLE `residence_status_factors` (
 
 INSERT INTO `residence_status_factors` (`id`, `status`, `trend_threshold`, `factor`, `description`) VALUES
 (1, 'erstwohnsitz', 0.00, 1.000, 'Erstwohnsitz: Baseline (100% des Basiswerts)'),
-(2, 'zweitwohnsitz', 0.00, 1.120, 'Zweitwohnsitz: Standardgebiet (+12% wegen Knappheit)'),
+(2, 'zweitwohnsitz', 0.00, 1.120, 'Zweitwohnsitz: Standardgebiet (+18% wegen Knappheit)'),
 (3, 'zweitwohnsitz', 1.01, 1.250, 'Zweitwohnsitz: Begehrte Tourismusregion (+25% wegen Lex Weber Knappheit)'),
 (4, 'zweitwohnsitz_privilegiert', 0.00, 1.200, 'Privilegierte Zweitwohnung (Altrecht): Standardgebiet (+20%)'),
 (5, 'zweitwohnsitz_privilegiert', 1.01, 1.250, 'Privilegierte Zweitwohnung (Altrecht): Tourismusregion (+25%)'),
@@ -455,7 +455,7 @@ CREATE TABLE `valuations` (
   `location_name` varchar(100) DEFAULT NULL,
   `country` varchar(5) DEFAULT 'CH',
   `property_type` varchar(50) NOT NULL,
-  `area` decimal(10,2) NOT NULL,
+  `area` decimal(10,2) DEFAULT NULL,
   `plot_area_m2` decimal(10,2) DEFAULT NULL COMMENT 'Grundstücksfläche in m² (für Einfamilienhaus)',
   `property_condition` varchar(30) NOT NULL,
   `equipment` varchar(30) NOT NULL,
@@ -469,7 +469,21 @@ CREATE TABLE `valuations` (
   `equipment_factor` decimal(4,3) NOT NULL DEFAULT 1.000,
   `residence_status` varchar(30) DEFAULT 'erstwohnsitz',
   `residence_status_factor` decimal(4,3) NOT NULL DEFAULT 1.000,
+  `rooms` decimal(10,2) DEFAULT NULL,
   `development_potential_factor` decimal(4,3) NOT NULL DEFAULT 1.000 COMMENT 'Ausnützungsreserve Faktor',
+  `anzahl_apartments` int(11) DEFAULT NULL COMMENT 'Anzahl Wohnungen (für Mehrfamilienhaus)',
+  `brutto_miete_monat` decimal(12,2) DEFAULT NULL COMMENT 'Bruttomiete pro Monat (für Mehrfamilienhaus)',
+  `brutto_miete_pa` decimal(12,2) DEFAULT NULL COMMENT 'Bruttomiete pro Jahr (für Mehrfamilienhaus)',
+  `netto_miete_pa` decimal(12,2) DEFAULT NULL COMMENT 'Nettomiete pro Jahr (für Mehrfamilienhaus)',
+  `ertragswert` decimal(14,2) DEFAULT NULL COMMENT 'Ertragswert (für Mehrfamilienhaus)',
+  `mischwert_final` decimal(14,2) DEFAULT NULL COMMENT 'Gewichteter Mischwert (für Mehrfamilienhaus)',
+  `brutto_rendite_pct` decimal(6,2) DEFAULT NULL COMMENT 'Bruttorendite in % (für Mehrfamilienhaus)',
+  `building_value` decimal(14,2) DEFAULT NULL,
+  `development_value` decimal(14,2) DEFAULT NULL,
+  `effective_location_factor` decimal(4,3) DEFAULT 1.000,
+  `kapitalisierungs_satz_pct` decimal(5,2) DEFAULT NULL,
+  `kostenquote_pct` decimal(5,2) DEFAULT NULL,
+  `size_multiplier` decimal(4,3) DEFAULT 1.000,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -478,13 +492,9 @@ CREATE TABLE `valuations` (
 -- Dumping data for table `valuations`
 --
 
-INSERT INTO `valuations` (`id`, `plz`, `location_name`, `country`, `property_type`, `area`, `plot_area_m2`, `property_condition`, `equipment`, `micro_location`, `development_potential`, `price_per_sqm`, `total_value`, `location_factor`, `micro_location_factor`, `condition_factor`, `equipment_factor`, `residence_status`, `residence_status_factor`, `development_potential_factor`, `created_at`, `updated_at`) VALUES
-(1, '7000', 'Chur', 'CH', 'Einfamilienhaus', 180.00, 500.00, 'renoviert', 'gehoben', 'good', 'minor', 11700.00, 2106000.00, 1.900, 1.000, 1.100, 1.150, 'erstwohnsitz', 1.000, 1.080, '2025-01-15 13:30:00', '2025-01-15 13:30:00'),
-(2, '7260', 'Davos', 'CH', 'Wohnung', 95.50, NULL, 'neuwertig', 'luxus', 'top', NULL, 14250.00, 1360875.00, 1.600, 1.200, 1.200, 1.300, 'zweitwohnsitz', 1.250, 1.000, '2025-02-20 09:15:00', '2025-02-20 09:15:00'),
-(3, '7500', 'St. Moritz', 'CH', 'Einfamilienhaus', 250.00, 800.00, 'renoviert', 'luxus', 'top', 'major', 16500.00, 4125000.00, 1.600, 1.250, 1.100, 1.300, 'zweitwohnsitz', 1.250, 1.200, '2025-03-10 08:00:00', '2025-03-10 08:00:00'),
-(4, '7031', 'Laax', 'CH', 'Mehrfamilienhaus', 320.00, NULL, 'gepflegt', 'standard', 'good', NULL, 8500.00, 2720000.00, 1.400, 1.000, 1.000, 1.000, 'feriendomizil', 1.150, 1.000, '2025-04-05 14:45:00', '2025-04-05 14:45:00'),
-(5, '7111', 'Ilanz/Glion', 'CH', 'Reihenhaus', 140.00, 350.00, 'gepflegt', 'standard', 'standard', 'none', 6200.00, 868000.00, 1.100, 1.000, 1.000, 1.000, 'erstwohnsitz', 1.000, 1.000, '2025-05-18 09:20:00', '2025-05-18 09:20:00'),
-(6, '7074', 'Malix', 'CH', 'Wohnung', 120.00, 0.00, 'neuwertig', 'gehoben', 'good', 'none', 13701.47, 1644176.16, 1.000, 1.100, 1.200, 1.150, 'erstwohnsitz', 1.000, 1.000, '2026-10-06 14:43:55', '2026-10-06 14:43:55');
+INSERT INTO `valuations` (`id`, `plz`, `location_name`, `country`, `property_type`, `area`, `plot_area_m2`, `property_condition`, `equipment`, `micro_location`, `development_potential`, `price_per_sqm`, `total_value`, `location_factor`, `micro_location_factor`, `condition_factor`, `equipment_factor`, `residence_status`, `residence_status_factor`, `rooms`, `development_potential_factor`, `anzahl_apartments`, `brutto_miete_monat`, `brutto_miete_pa`, `netto_miete_pa`, `ertragswert`, `mischwert_final`, `brutto_rendite_pct`, `building_value`, `development_value`, `effective_location_factor`, `kapitalisierungs_satz_pct`, `kostenquote_pct`, `size_multiplier`, `created_at`, `updated_at`) VALUES
+(17, '7408', 'Cazis', 'CH', 'Mehrfamilienhaus', 210.00, 900.00, 'renierungsbedürftig', 'einfach', 'standard', 'none', 2718.05, 570789.45, 1.100, 0.850, 0.570, 0.850, 'erstwohnsitz', 1.000, 0.00, 1.000, 3, 3000.00, 36000.00, 28800.00, 480000.00, 502697.36, 6.31, NULL, NULL, 1.000, NULL, NULL, 1.000, '2026-10-13 16:42:27', '2026-10-13 16:42:27'),
+(18, '7075', 'Churwalden', 'CH', 'Mehrfamilienhaus', 490.00, 1200.00, 'neuwertig', 'standard', 'standard', 'none', 7917.75, 3879697.50, 1.080, 0.850, 1.150, 1.000, 'zweitwohnsitz', 1.250, 0.00, 1.000, 7, 9000.00, 108000.00, 86400.00, 1728000.00, 2265924.38, 2.78, NULL, NULL, 1.000, NULL, NULL, 1.000, '2026-10-13 16:43:39', '2026-10-13 16:43:39');
 
 --
 -- Indexes for dumped tables
@@ -541,13 +551,7 @@ ALTER TABLE `residence_status_factors`
 -- Indexes for table `valuations`
 --
 ALTER TABLE `valuations`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_plz` (`plz`),
-  ADD KEY `idx_location` (`location_name`),
-  ADD KEY `idx_property_type` (`property_type`),
-  ADD KEY `idx_created_at` (`created_at`),
-  ADD KEY `idx_micro_location` (`micro_location`),
-  ADD KEY `idx_development_potential` (`development_potential`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -593,7 +597,7 @@ ALTER TABLE `residence_status_factors`
 -- AUTO_INCREMENT for table `valuations`
 --
 ALTER TABLE `valuations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -279,6 +279,9 @@ class Homes extends \Core\Controller
     /**
      * Calculate valuation (POST /homes/calculate)
      * Returns JSON with calculated valuation data.
+     *
+     * For 'Mehrfamilienhaus': requires anzahl_apartments and brutto_miete_monat
+     * For other property types: requires area and rooms
      */
     public function calculateAction(): void
     {
@@ -288,28 +291,54 @@ class Homes extends \Core\Controller
 
         $plz                = $input['plz'] ?? '';
         $propertyType       = $input['property_type'] ?? '';
-        $area               = $input['area'] ?? 0;
+        $area               = $input['area'] ?? null;
         $plotAreaM2         = $input['plot_area_m2'] ?? 0;
-        $rooms              = $input['rooms'] ?? 0;
+        $rooms              = $input['rooms'] ?? null;
         $property_condition = $input['property_condition'] ?? '';
         $equipment          = $input['equipment'] ?? '';
         $microLocation      = $input['micro_location'] ?? 'standard';
         $developmentPotential = $input['development_potential'] ?? 'none';
         $residenceStatus   = $input['residence_status'] ?? 'erstwohnsitz';
 
-        // Server-side validation
-        if (empty($plz) || empty($propertyType) || empty($area) || empty($rooms) || empty($property_condition) || empty($equipment)) {
+        // Extract MFH-specific parameters
+        $anzahlApartments   = isset($input['anzahl_apartments']) ? (int) $input['anzahl_apartments'] : null;
+        $bruttoMieteMonat   = isset($input['brutto_miete_monat']) ? (float) $input['brutto_miete_monat'] : null;
+
+        // Server-side validation — differs by property type
+        if (empty($plz) || empty($propertyType) || empty($property_condition) || empty($equipment)) {
             http_response_code(400);
             echo json_encode(['error' => 'Ungültige PLZ oder fehlende Angaben']);
             exit;
         }
 
-        $area = (float) $area;
-        if ($area <= 0) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Wohnfläche muss grösser als 0 sein.']);
-            exit;
+        if (strtolower($propertyType) === 'mehrfamilienhaus') {
+            // For Mehrfamilienhaus: validate MFH-specific fields
+            if (!$anzahlApartments || $anzahlApartments < 1) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Anzahl Wohnungen muss mindestens 1 sein.']);
+                exit;
+            }
+            if ($bruttoMieteMonat === null || $bruttoMieteMonat <= 0) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Bruttomiete pro Monat muss grösser als 0 sein.']);
+                exit;
+            }
+        } else {
+            // For other property types: validate standard fields
+            if ($area === null || (float) $area <= 0) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Wohnfläche muss grösser als 0 sein.']);
+                exit;
+            }
+            if ($rooms === null || (float) $rooms <= 0) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Anzahl Zimmer muss grösser als 0 sein.']);
+                exit;
+            }
         }
+
+        $area = $area !== null ? (float) $area : 0;
+        $rooms = $rooms !== null ? (float) $rooms : 0;
 
         $result = Home::calculateValuation(
             $plz,
@@ -321,7 +350,9 @@ class Homes extends \Core\Controller
             $equipment,
             $microLocation,
             $developmentPotential,
-            $residenceStatus
+            $residenceStatus,
+            $anzahlApartments,
+            $bruttoMieteMonat
         );
 
         echo json_encode(['success' => true, 'data' => $result]);
